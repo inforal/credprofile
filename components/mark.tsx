@@ -1,13 +1,10 @@
-export function Mark({ size = 22 }: { size?: number }) {
+export function Mark({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <path
-        d="M5 5h7M5 5v7M27 5h-7M27 5v7M5 27h7M5 27v-7M27 27h-7M27 27v-7"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.4"
-      />
-      <rect x="14" y="14" width="4" height="4" fill="#9d1c1c" />
+      <rect width="32" height="32" rx="9" fill="#1636b8" />
+      <rect x="7" y="8" width="13" height="16" rx="3" fill="#ffffff" opacity="0.95" />
+      <rect x="13" y="12" width="12" height="12" rx="3" fill="#d7e3ff" />
+      <circle cx="22.5" cy="10" r="2.2" fill="#ff8a6a" />
     </svg>
   );
 }

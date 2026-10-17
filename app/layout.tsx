@@ -1,18 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Newsreader, Outfit } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { siteUrl } from "@/lib/site";
 
-const outfit = Outfit({
+const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-ui",
-});
-
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -21,7 +14,7 @@ export const metadata: Metadata = {
     default: "CredProfile.com",
     template: "%s | CredProfile.com",
   },
-  description: "Perfil público y fichas para las credenciales que tú declaras.",
+  description: "Perfil público y fichas para las credenciales que tú declaras. CredProfile no emite ni verifica.",
   applicationName: "CredProfile",
   openGraph: {
     type: "website",
@@ -41,8 +34,8 @@ export const dynamic = "force-dynamic";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${outfit.variable} ${newsreader.variable}`}>
-      <body className={outfit.className}>
+    <html lang="es">
+      <body className={sans.className}>
         <a className="skip" href="#contenido">
           Saltar al contenido
         </a>

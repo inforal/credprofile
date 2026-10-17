@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Mark } from "@/components/mark";
+import { SiteFooter } from "@/components/page-footer";
+import { SiteHeader } from "@/components/site-header";
 import { getAuthUserId } from "@/lib/auth";
 import { getOwnProfile } from "@/lib/data";
 
@@ -20,53 +22,54 @@ export const metadata = {
   },
 };
 
+const links = [
+  { href: "#producto", label: "Producto" },
+  { href: "#como-funciona", label: "Cómo funciona" },
+  { href: "#seguridad", label: "Seguridad" },
+];
+
 export default async function HomePage() {
   const userId = await getAuthUserId();
   const profile = userId ? await getOwnProfile(userId) : null;
 
   return (
-    <div className="home">
-      <header className="topbar">
-        <div className="topbar-inner">
-          <Link href="/" className="brand">
-            <Mark />
-            <span>CredProfile</span>
-          </Link>
-          <nav className="nav-actions" aria-label="Secciones">
-            <a href="#producto">Producto</a>
-            <a href="#como-funciona">Cómo funciona</a>
-            <a href="#seguridad">Seguridad</a>
-          </nav>
-          <div className="nav-actions">
-            {profile ? (
-              <Link className="btn" href="/panel">
-                Panel
+    <>
+      <SiteHeader
+        links={links}
+        actions={
+          profile ? (
+            <Link className="btn" href="/panel">
+              Ir al panel
+            </Link>
+          ) : (
+            <>
+              <Link href="/entrar">Entrar</Link>
+              <Link className="btn" href="/registro">
+                Crear perfil
               </Link>
-            ) : (
-              <>
-                <Link href="/entrar">Entrar</Link>
-                <Link className="btn" href="/registro">
-                  Crear perfil
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+            </>
+          )
+        }
+      />
       <main id="contenido">
-        <section className="home-hero">
-          <div>
-            <p className="eyebrow">Perfil y fichas</p>
-            <h1>Lo que declaras, en una página que se puede leer.</h1>
+        <section className="hero-band">
+          <div className="hero-copy">
+            <p className="eyebrow">Perfil público de credenciales</p>
+            <h1>Todas tus credenciales, en un perfil que se puede compartir.</h1>
             <p className="lede">
-              Un perfil público reúne tus credenciales. Cada una tiene su ficha: datos, insignia y PDF. El enlace
-              oficial, si existe, lo añades tú. CredProfile no emite ni verifica.
+              Cada certificación tiene su propia ficha. Tú publicas los datos, la insignia y el PDF. Si hay una página
+              oficial, el enlace lo añades tú. CredProfile no emite ni verifica.
             </p>
             <div className="actions">
               {profile ? (
-                <Link className="btn" href="/panel">
-                  Ir al panel
-                </Link>
+                <>
+                  <Link className="btn" href="/panel">
+                    Ir al panel
+                  </Link>
+                  <Link className="btn secondary" href={`/${profile.username}`}>
+                    Ver mi perfil
+                  </Link>
+                </>
               ) : (
                 <>
                   <Link className="btn" href="/registro">
@@ -79,109 +82,157 @@ export default async function HomePage() {
               )}
             </div>
           </div>
-          <div className="specimen" aria-hidden="true">
-            <p className="specimen-kicker">credprofile.com/ana</p>
-            <ol>
-              <li>
-                <span>01</span> Professional Scrum Master I <em>Pública</em>
-              </li>
-              <li>
-                <span>02</span> AWS Certified AI Strategist <em>Pública</em>
-              </li>
-              <li>
-                <span>03</span> PRINCE2 Foundation <em>Borrador</em>
-              </li>
-            </ol>
-            <div className="specimen-sheet">
-              <p>Ficha 01</p>
+          <div className="mock" aria-hidden="true">
+            <div className="mock-window">
+              <div className="mock-bar">
+                <Mark size={18} />
+                <span>credprofile.com/ana</span>
+              </div>
+              <div className="mock-body">
+                <div className="mock-profile">
+                  <strong>Ana Ruiz</strong>
+                  <span>3 credenciales en el perfil</span>
+                </div>
+                <ul>
+                  <li>
+                    <i />
+                    <div>
+                      <b>Professional Scrum Master I</b>
+                      <small>Scrum.org</small>
+                    </div>
+                    <em>Pública</em>
+                  </li>
+                  <li>
+                    <i className="alt" />
+                    <div>
+                      <b>AWS AI Strategist</b>
+                      <small>Amazon Web Services</small>
+                    </div>
+                    <em>Pública</em>
+                  </li>
+                  <li>
+                    <i className="muted" />
+                    <div>
+                      <b>PRINCE2 Foundation</b>
+                      <small>PeopleCert</small>
+                    </div>
+                    <em className="draft">Borrador</em>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <aside className="mock-card">
+              <p>Ficha</p>
               <strong>Professional Scrum Master I</strong>
-              <span>Ana Ruiz · datos, insignia, PDF</span>
+              <span>Insignia · PDF · enlace oficial opcional</span>
+            </aside>
+          </div>
+        </section>
+
+        <section className="benefit-row" aria-label="Qué obtienes">
+          <article>
+            <h2>Un perfil, varias fichas</h2>
+            <p>La dirección pública lista lo que marcas como visible. Cada credencial abre su propia página.</p>
+          </article>
+          <article>
+            <h2>Archivo o URL</h2>
+            <p>La insignia y el PDF son obligatorios. Los subes o pegas un enlace. El logo del emisor es opcional.</p>
+          </article>
+          <article>
+            <h2>Enlace oficial, si quieres</h2>
+            <p>Puedes apuntar a la página del emisor. No contrastamos ese enlace ni damos el título por válido.</p>
+          </article>
+        </section>
+
+        <section className="band" id="producto">
+          <div className="band-copy">
+            <p className="eyebrow">Producto</p>
+            <h2>El perfil agrupa. La ficha explica.</h2>
+            <p>
+              Quien recibe tu dirección ve el conjunto. Quien abre una credencial ve los datos, la insignia, las
+              competencias y el PDF, solo si los has rellenado.
+            </p>
+          </div>
+          <div className="band-visual" aria-hidden="true">
+            <div className="mini-sheet">
+              <span>Ficha pública</span>
+              <strong>Professional Scrum Master I</strong>
+              <dl>
+                <div>
+                  <dt>Titular</dt>
+                  <dd>Ana Ruiz</dd>
+                </div>
+                <div>
+                  <dt>Emisor</dt>
+                  <dd>Scrum.org</dd>
+                </div>
+              </dl>
             </div>
           </div>
         </section>
 
-        <section className="home-band" id="producto" aria-labelledby="producto-title">
-          <div>
-            <p className="eyebrow">Producto</p>
-            <h2 id="producto-title">Dos piezas, no un certificado único.</h2>
+        <section className="band alt" id="como-funciona">
+          <div className="band-copy">
+            <p className="eyebrow">Cómo funciona</p>
+            <h2>Tres pasos, sin intermediarios.</h2>
           </div>
-          <div className="home-split">
-            <article>
-              <h3>El perfil</h3>
-              <p>La dirección con tu nombre y el listado de lo que has marcado como público.</p>
-            </article>
-            <article>
-              <h3>La ficha</h3>
-              <p>Una página por credencial. Si un campo está vacío, no se imprime.</p>
-            </article>
-            <article>
-              <h3>El enlace oficial</h3>
-              <p>Opcional. Apunta a la página del emisor si quieres. Nosotros no la contrastamos.</p>
-            </article>
-          </div>
-        </section>
-
-        <section className="home-steps" id="como-funciona" aria-labelledby="pasos-title">
-          <h2 id="pasos-title">Tres movimientos.</h2>
-          <ol>
+          <ol className="steps">
             <li>
-              <b>01</b>
-              <h3>Abres el perfil</h3>
-              <p>Nombre y usuario. Esa es la URL.</p>
+              <b>1</b>
+              <h3>Crea el perfil</h3>
+              <p>Nombre y usuario. Esa combinación es tu dirección pública.</p>
             </li>
             <li>
-              <b>02</b>
-              <h3>Declaras la credencial</h3>
-              <p>Insignia y PDF, subidos o por URL. El resto, si lo tienes.</p>
+              <b>2</b>
+              <h3>Añade la credencial</h3>
+              <p>Datos, insignia y PDF. El enlace oficial queda vacío si no lo tienes.</p>
             </li>
             <li>
-              <b>03</b>
-              <h3>Publicas o guardas</h3>
-              <p>Borrador en el panel, o ficha visible para quien tenga el enlace.</p>
+              <b>3</b>
+              <h3>Publica cuando quieras</h3>
+              <p>Un borrador se queda en el panel. Una ficha publicada se puede compartir.</p>
             </li>
           </ol>
         </section>
 
-        <section className="home-safe" id="seguridad" aria-labelledby="seguridad-title">
-          <h2 id="seguridad-title">Autoridad de lectura, no de sello.</h2>
-          <div>
-            <p>El titular es quien escribe. La sesión es quien edita. El público solo ve lo publicado.</p>
-            <ul>
-              <li>Puedes ocultar el perfil entero.</li>
-              <li>Cada ficha se publica por separado.</li>
-              <li>Los archivos subidos viven en tu carpeta.</li>
-              <li>Una URL externa no se copia a nuestro almacén.</li>
-            </ul>
+        <section className="band" id="seguridad">
+          <div className="band-copy">
+            <p className="eyebrow">Control</p>
+            <h2>Tú decides qué se ve.</h2>
+            <p>CredProfile guarda lo que publicas. No actúa como entidad emisora ni como verificador.</p>
           </div>
+          <ul className="safe-list">
+            <li>El perfil puede ocultarse entero.</li>
+            <li>Cada ficha se publica por separado.</li>
+            <li>Solo tu sesión edita el perfil y las fichas.</li>
+            <li>Lo que subes queda en tu carpeta. Una URL externa no se copia.</li>
+          </ul>
         </section>
 
-        <section className="home-end">
-          <h2>La primera ficha cabe en una tarde.</h2>
+        <section className="cta-band">
+          <div>
+            <h2>Empieza por una ficha.</h2>
+            <p>Crea el perfil, declara una credencial y comparte la dirección cuando esté lista.</p>
+          </div>
           <div className="actions">
             {profile ? (
-              <Link className="btn" href="/panel">
+              <Link className="btn light" href="/panel">
                 Ir al panel
               </Link>
             ) : (
               <>
-                <Link className="btn" href="/registro">
+                <Link className="btn light" href="/registro">
                   Crear perfil
                 </Link>
-                <Link className="btn secondary" href="/entrar">
+                <Link className="btn secondary light-ghost" href="/entrar">
                   Entrar
                 </Link>
               </>
             )}
           </div>
         </section>
-        <footer className="site-foot">
-          <p>© {new Date().getFullYear()} CredProfile.com</p>
-          <nav aria-label="Pie">
-            <Link href="/registro">Crear perfil</Link>
-            <Link href="/entrar">Entrar</Link>
-          </nav>
-        </footer>
+        <SiteFooter />
       </main>
-    </div>
+    </>
   );
 }
