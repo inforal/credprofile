@@ -4,6 +4,7 @@ import { PageFooter } from "@/components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { loadPublicProfile } from "@/lib/data";
 import { issuedLabel } from "@/lib/format";
+import { socialMetadata } from "@/lib/seo";
 import { safeHttpUrl } from "@/lib/validation";
 
 export async function generateMetadata({
@@ -14,10 +15,13 @@ export async function generateMetadata({
   const { username } = await params;
   const loaded = await loadPublicProfile(username);
   if (!loaded) return { title: "Perfil no encontrado" };
-  return {
+  const description = loaded.profile.bio?.trim() || `Credenciales profesionales de ${loaded.profile.full_name}.`;
+  return socialMetadata({
     title: loaded.profile.full_name,
-    description: loaded.profile.bio?.trim() || `Credenciales profesionales de ${loaded.profile.full_name}.`,
-  };
+    description,
+    path: `/${loaded.profile.username}`,
+    image: loaded.profile.avatar_url,
+  });
 }
 
 export default async function PublicProfilePage({
@@ -38,7 +42,7 @@ export default async function PublicProfilePage({
   return (
     <>
       <SiteHeader />
-      <main className="container">
+      <main className="container" id="contenido">
         {isOwner ? (
           <p className="bread">
             <Link href="/panel">Editar en el panel</Link>
@@ -46,7 +50,7 @@ export default async function PublicProfilePage({
           </p>
         ) : null}
         <section className={avatar ? "card hero" : "card hero plain"}>
-          {avatar ? <img className="avatar" src={avatar} alt="" /> : null}
+          {avatar ? <img className="avatar" src={avatar} alt={`Foto de ${profile.full_name}`} /> : null}
           <div>
             <div className="eyebrow">Perfil profesional</div>
             <h1>{profile.full_name}</h1>
@@ -68,11 +72,12 @@ export default async function PublicProfilePage({
             ) : null}
           </div>
         </section>
-        <section className="stack" style={{ marginTop: 22 }}>
-          <h2 className="page-title">Credenciales</h2>
+        <section className="stack profile-block">
+          <h2 className="section-heading">Credenciales</h2>
           {credentials.length === 0 ? (
-            <section className="card pad">
-              <p className="about">No hay credenciales publicadas.</p>
+            <section className="card pad empty-state">
+              <h3>No hay credenciales publicadas</h3>
+              <p className="about">Cuando este perfil publique una certificación, aparecerá aquí.</p>
             </section>
           ) : (
             <div className="cred-grid">
@@ -80,7 +85,7 @@ export default async function PublicProfilePage({
                 const date = issuedLabel(credential);
                 return (
                   <Link className="card cred-card" key={credential.id} href={`/${profile.username}/${credential.slug}`}>
-                    <img src={credential.badge_image_url} alt="" />
+                    <img src={credential.badge_image_url} alt={`Insignia de ${credential.title}`} />
                     <div>
                       <div className="eyebrow">{credential.credential_type_label}</div>
                       <strong>{credential.title}</strong>

@@ -1,11 +1,11 @@
 import Link from "next/link";
+import { AuthShell } from "@/components/auth-shell";
 import { LoginForm } from "@/components/login-form";
-import { PageFooter } from "@/components/page-footer";
-import { SiteHeader } from "@/components/site-header";
 import { safeNextPath } from "@/lib/validation";
 
 export const metadata = {
   title: "Entrar",
+  robots: { index: false, follow: false },
 };
 
 export default async function EntrarPage({
@@ -15,18 +15,12 @@ export default async function EntrarPage({
 }) {
   const params = await searchParams;
   return (
-    <>
-      <SiteHeader
-        actions={
-          <Link href="/registro">Crear cuenta</Link>
-        }
-      />
-      <main className="container">
-        <div className="narrow">
-          <LoginForm nextPath={safeNextPath(params.next)} />
-        </div>
-        <PageFooter />
-      </main>
-    </>
+    <AuthShell
+      title="Entra en tu perfil"
+      lede="Usa el correo o el nombre de usuario. Desde el panel publicas y actualizas cada credencial."
+      actions={<Link href="/registro">Crear cuenta</Link>}
+    >
+      <LoginForm nextPath={safeNextPath(params.next)} />
+    </AuthShell>
   );
 }

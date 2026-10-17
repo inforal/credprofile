@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, Field } from "@/components/form-ui";
 import { authErrorMessage } from "@/lib/errors";
+import { emailConfirmUrl } from "@/lib/site";
 import { createClient } from "@/lib/supabase/client";
 import { isEmail, usernameProblem } from "@/lib/validation";
 
@@ -46,6 +48,7 @@ export function RegisterForm() {
         email: email.trim().toLowerCase(),
         password,
         options: {
+          emailRedirectTo: emailConfirmUrl(),
           data: {
             username: username.trim(),
             full_name: fullName.trim(),
@@ -65,25 +68,43 @@ export function RegisterForm() {
         router.refresh();
         return;
       }
-      setMessage("Cuenta creada. Revisa tu correo para confirmarla y después entra.");
+      setMessage(email.trim().toLowerCase());
     } finally {
       setPending(false);
     }
   }
 
+  if (message) {
+    return (
+      <section className="card pad stack" role="status" aria-live="polite">
+        <p className="eyebrow">Cuenta creada</p>
+        <h2>Revisa tu email</h2>
+        <p className="about">
+          Te hemos enviado un enlace de confirmación a <strong>{message}</strong>. Ábrelo en este navegador para activar
+          la cuenta. Después podrás entrar.
+        </p>
+        <p className="muted">Si no llega en unos minutos, mira en el correo no deseado. El enlace caduca.</p>
+        <Link className="btn" href="/entrar">
+          Ir a entrar
+        </Link>
+      </section>
+    );
+  }
+
   return (
-    <form className="card pad stack" onSubmit={onSubmit} noValidate>
-      <div>
-        <h1 className="page-title">Crear cuenta</h1>
-        <p className="muted">El usuario será la dirección de tu perfil público.</p>
-      </div>
+    <form className="card pad stack" onSubmit={onSubmit} noValidate aria-busy={pending}>
       {error ? <Alert>{error}</Alert> : null}
-      {message ? <Alert kind="ok">{message}</Alert> : null}
       <Field label="Nombre completo">
         <input value={fullName} onChange={(event) => setFullName(event.target.value)} autoComplete="name" required />
       </Field>
       <Field label="Usuario" hint="De 3 a 40 caracteres. Letras, números, puntos y guiones.">
-        <input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" required />
+        <input
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          autoComplete="username"
+          spellCheck={false}
+          required
+        />
       </Field>
       <Field label="Correo">
         <input

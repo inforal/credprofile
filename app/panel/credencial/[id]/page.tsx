@@ -27,7 +27,7 @@ export default async function EditCredentialPage({
   );
 
   return (
-    <main className="container stack">
+    <main className="container stack" id="contenido">
       <div className="section-head">
         <div>
           <h1 className="page-title">Editar credencial</h1>

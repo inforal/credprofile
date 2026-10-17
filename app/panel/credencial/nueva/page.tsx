@@ -15,7 +15,7 @@ export default async function NewCredentialPage() {
   if (!profile) redirect("/panel");
 
   return (
-    <main className="container stack">
+    <main className="container stack" id="contenido">
       <div>
         <h1 className="page-title">Nueva credencial</h1>
         <p className="intro">La insignia y el PDF son obligatorios. Puedes subir cada archivo o pegar su URL.</p>

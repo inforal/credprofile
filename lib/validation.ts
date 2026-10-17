@@ -4,14 +4,20 @@ const HTTP_URL = /^https?:\/\/\S+$/i;
 
 export const RESERVED_USERNAMES = new Set([
   "api",
+  "apple-icon",
   "auth",
   "credprofile",
   "entrar",
   "favicon.ico",
   "icon",
+  "manifest.webmanifest",
+  "opengraph-image",
   "panel",
   "public",
   "registro",
+  "robots.txt",
+  "sitemap.xml",
+  "twitter-image",
   "www",
 ]);
 
@@ -41,8 +47,8 @@ export function usernameProblem(value: string): string | null {
 export function slugProblem(value: string): string | null {
   const slug = value.trim();
   if (!slug) return "Escribe un enlace para la ficha.";
-  if (!SLUG.test(slug)) {
-    return "El enlace solo puede tener minúsculas, números y guiones.";
+  if (slug.length > 80 || !SLUG.test(slug)) {
+    return "El enlace solo puede tener minúsculas, números y guiones, con un máximo de 80 caracteres.";
   }
   return null;
 }

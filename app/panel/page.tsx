@@ -20,7 +20,7 @@ export default async function PanelPage() {
   const profile = await getOwnProfile(userId);
   if (!profile) {
     return (
-      <main className="container">
+      <main className="container" id="contenido">
         <section className="card pad">
           <h1 className="page-title">No encontramos tu perfil</h1>
           <p className="about">La cuenta existe, pero el perfil todavía no está disponible. Vuelve a entrar en unos segundos.</p>
@@ -31,18 +31,34 @@ export default async function PanelPage() {
   const credentials = await listOwnCredentials(userId);
 
   return (
-    <main className="container stack">
+    <main className="container stack" id="contenido">
+      <header className="panel-intro">
+        <p className="eyebrow">Panel</p>
+        <h1 className="page-title">{profile.full_name}</h1>
+        <p className="muted">
+          Perfil público: <Link href={`/${profile.username}`}>/{profile.username}</Link>
+          {profile.is_public ? "" : " · oculto para el resto"}
+        </p>
+      </header>
       <ProfileForm profile={profile} />
-      <section className="stack">
+      <section className="stack" aria-labelledby="mis-credenciales">
         <div className="section-head">
-          <h2 className="page-title">Credenciales</h2>
-          <Link className="btn" href="/panel/credencial/nueva">
-            Nueva credencial
-          </Link>
+          <h2 className="section-heading" id="mis-credenciales">
+            Credenciales
+          </h2>
+          {credentials.length > 0 ? (
+            <Link className="btn" href="/panel/credencial/nueva">
+              Nueva credencial
+            </Link>
+          ) : null}
         </div>
         {credentials.length === 0 ? (
-          <section className="card pad">
-            <p className="about">Todavía no has añadido ninguna credencial.</p>
+          <section className="card pad empty-state">
+            <h3>Todavía no hay credenciales</h3>
+            <p className="about">Añade la primera con su insignia y el PDF. Puedes subir los archivos o pegar una URL.</p>
+            <Link className="btn" href="/panel/credencial/nueva">
+              Nueva credencial
+            </Link>
           </section>
         ) : (
           <ul className="cred-list">
@@ -50,7 +66,7 @@ export default async function PanelPage() {
               const date = issuedLabel(credential);
               return (
                 <li className="card cred-row" key={credential.id}>
-                  <img src={credential.badge_image_url} alt="" />
+                  <img src={credential.badge_image_url} alt={`Insignia de ${credential.title}`} />
                   <div className="cred-copy">
                     <strong>{credential.title}</strong>
                     <p>

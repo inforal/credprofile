@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, Field } from "@/components/form-ui";
@@ -54,11 +55,8 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
   }
 
   return (
-    <form className="card pad stack" onSubmit={onSubmit} noValidate>
-      <div>
-        <h1 className="page-title">Entrar</h1>
-        <p className="muted">Usa tu correo o tu nombre de usuario.</p>
-      </div>
+    <form className="card pad stack" onSubmit={onSubmit} noValidate aria-busy={pending}>
+      <p className="muted">Correo o nombre de usuario, y contraseña.</p>
       {error ? <Alert>{error}</Alert> : null}
       <Field label="Correo o usuario">
         <input
@@ -80,6 +78,9 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
       <button className="btn" type="submit" disabled={pending}>
         {pending ? "Entrando…" : "Entrar"}
       </button>
+      <p className="muted">
+        ¿Aún no tienes cuenta? <Link href="/registro">Crear cuenta</Link>
+      </p>
     </form>
   );
 }

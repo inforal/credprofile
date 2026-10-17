@@ -17,6 +17,9 @@ Copia `.env.example` a `.env.local` y rellena:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SITE_URL` (por defecto en el código, `https://credprofile.com`)
+
+El alta envía el enlace de confirmación a `/auth/confirm`.
 
 `.env.local` no se sube al repositorio.
 
