@@ -86,7 +86,9 @@ export default async function PublicProfilePage({
                 const date = issuedLabel(credential);
                 return (
                   <Link className="card cred-card" key={credential.id} href={`/${profile.username}/${credential.slug}`}>
-                    <img src={credential.badge_image_url} alt={`Insignia de ${credential.title}`} />
+                    {safeHttpUrl(credential.badge_image_url) ? (
+                      <img src={credential.badge_image_url ?? ""} alt={`Insignia de ${credential.title}`} />
+                    ) : null}
                     <div>
                       <div className="eyebrow">{credential.credential_type_label}</div>
                       <strong>{credential.title}</strong>

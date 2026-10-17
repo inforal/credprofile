@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
-  badgeTitle,
   formatSpanishDate,
   holderName,
   issuedLabel,
@@ -58,8 +57,6 @@ export function CredentialSheet({
   const code = credential.credential_code?.trim() ?? "";
   const description = credential.description?.trim() ?? "";
   const skills = credential.skills.map((skill) => skill.trim()).filter(Boolean);
-  const badgeName = badgeTitle(credential);
-  const badgeDescription = credential.badge_description?.trim() ?? "";
   const badgeSrc = safeHttpUrl(credential.badge_image_url);
   const pdfSrc = safeHttpUrl(credential.pdf_url);
   const shortName = issuerShortName(credential);
@@ -114,7 +111,7 @@ export function CredentialSheet({
   ];
 
   const visibleRows = rows.filter((row): row is { label: string; value: ReactNode } => Boolean(row));
-  const hasRight = Boolean(badgeSrc || pdfSrc);
+  const hasRight = Boolean(pdfSrc);
 
   return (
     <article className="sheet">
@@ -124,13 +121,10 @@ export function CredentialSheet({
         <span>{credential.title}</span>
       </nav>
 
-      <section className={credential.show_hero_seal ? "sheet-hero" : "sheet-hero plain"}>
-        {credential.show_hero_seal ? (
-          <div className="sheet-seal" aria-hidden="true">
-            <svg width="42" height="42" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2.4">
-              <path d="M32 6 54 16v16c0 12-8 20-22 26C18 52 10 44 10 32V16L32 6Z" />
-              <path d="m22 32 7 7 14-16" strokeWidth="4" />
-            </svg>
+      <section className={badgeSrc ? "sheet-hero" : "sheet-hero plain"}>
+        {badgeSrc ? (
+          <div className="sheet-seal">
+            <img src={badgeSrc} alt={`Insignia de ${credential.title}`} />
           </div>
         ) : null}
         <div>
@@ -173,18 +167,6 @@ export function CredentialSheet({
         </div>
         {hasRight ? (
           <div className="sheet-stack">
-            {badgeSrc ? (
-              <section className="card pad">
-                <h2>Insignia</h2>
-                <div className="sheet-badge">
-                  <img src={badgeSrc} alt={`Insignia ${badgeName}`} loading="lazy" />
-                  <div>
-                    <strong>{badgeName}</strong>
-                    {badgeDescription ? <p className="badge-desc">{badgeDescription}</p> : null}
-                  </div>
-                </div>
-              </section>
-            ) : null}
             {pdfSrc ? (
               <section className="card sheet-doc">
                 <div className="dochead">

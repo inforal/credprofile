@@ -50,7 +50,6 @@ export function CredentialForm({
   const [slug, setSlug] = useState(credential?.slug ?? "");
   const [slugDirty, setSlugDirty] = useState(Boolean(credential));
   const [holderOverride, setHolderOverride] = useState(credential?.holder_name_override ?? "");
-  const [showSeal, setShowSeal] = useState(credential?.show_hero_seal ?? true);
   const [issuerName, setIssuerName] = useState(credential?.issuer_name ?? "");
   const [issuerShort, setIssuerShort] = useState(credential?.issuer_short_name ?? "");
   const [issuerUrl, setIssuerUrl] = useState(credential?.issuer_url ?? "");
@@ -70,11 +69,10 @@ export function CredentialForm({
   const [extras, setExtras] = useState<DraftField[]>(draftFields(credential?.extra_fields));
   const [description, setDescription] = useState(credential?.description ?? "");
   const [skills, setSkills] = useState((credential?.skills ?? []).join("\n"));
-  const [badgeMode, setBadgeMode] = useState<"upload" | "url">(credential?.badge_source ?? "url");
-  const [badgeUrl, setBadgeUrl] = useState(credential?.badge_source === "url" ? credential.badge_image_url : "");
+  const [badgeMode, setBadgeMode] = useState<LogoMode>(credential?.badge_source ?? "none");
+  const [badgeUrl, setBadgeUrl] = useState(credential?.badge_source === "url" ? (credential.badge_image_url ?? "") : "");
   const [badgeFile, setBadgeFile] = useState<File | null>(null);
   const [badgeTitleText, setBadgeTitleText] = useState(credential?.badge_title ?? "");
-  const [badgeDescription, setBadgeDescription] = useState(credential?.badge_description ?? "");
   const [pdfMode, setPdfMode] = useState<"upload" | "url">(credential?.pdf_source ?? "upload");
   const [pdfUrl, setPdfUrl] = useState(credential?.pdf_source === "url" ? credential.pdf_url : "");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -89,7 +87,9 @@ export function CredentialForm({
       ? credential?.badge_source === "upload"
         ? credential.badge_image_url
         : null
-      : safeHttpUrl(badgeUrl);
+      : badgeMode === "url"
+        ? safeHttpUrl(badgeUrl)
+        : null;
   const logoFallback =
     logoMode === "upload"
       ? credential?.issuer_logo_source === "upload"
@@ -162,8 +162,8 @@ export function CredentialForm({
         existingUrl: credential?.badge_image_url ?? null,
         existingPath: credential?.badge_storage_path ?? null,
         pathForExtension: (extension) => badgePath(userId, credentialId, extension),
-        required: true,
-        missingMessage: "La insignia es obligatoria: sube un archivo o pega una URL.",
+        required: false,
+        missingMessage: "Sube la insignia o pega su URL.",
       });
       if (badge.justUploaded) uploaded.push(badge.justUploaded);
 
@@ -201,8 +201,8 @@ export function CredentialForm({
       });
       if (logo.justUploaded) uploaded.push(logo.justUploaded);
 
-      if (!badge.url || !badge.source || !pdf.url || !pdf.source) {
-        throw new FormError("Faltan la insignia o el PDF.");
+      if (!pdf.url || !pdf.source) {
+        throw new FormError("Falta el PDF.");
       }
 
       const extraFields: ExtraField[] = [];
@@ -228,7 +228,7 @@ export function CredentialForm({
         title: cleanTitle,
         hero_title: blankToNull(heroTitle),
         holder_name_override: blankToNull(holderOverride),
-        show_hero_seal: showSeal,
+        show_hero_seal: credential?.show_hero_seal ?? true,
         issuer_name: cleanIssuer,
         issuer_short_name: blankToNull(issuerShort),
         issuer_url: issuerLink,
@@ -250,7 +250,7 @@ export function CredentialForm({
         badge_image_url: badge.url,
         badge_storage_path: badge.path,
         badge_title: blankToNull(badgeTitleText),
-        badge_description: blankToNull(badgeDescription),
+        badge_description: null,
         pdf_source: pdf.source,
         pdf_url: pdf.url,
         pdf_storage_path: pdf.path,
@@ -320,10 +320,6 @@ export function CredentialForm({
             <input value={holderOverride} onChange={(event) => setHolderOverride(event.target.value)} maxLength={160} />
           </Field>
         </div>
-        <label className="check">
-          <input type="checkbox" checked={showSeal} onChange={(event) => setShowSeal(event.target.checked)} />
-          Mostrar el sello en el hero
-        </label>
         <div className="form-grid two">
           <label className="check">
             <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
@@ -476,25 +472,43 @@ export function CredentialForm({
 
       <section className="card pad stack">
         <h2>Insignia</h2>
-        <ModeChoice name="badge-mode" mode={badgeMode} onChange={setBadgeMode} />
-        {badgeMode === "upload" ? (
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/svg+xml"
-            onChange={(event) => setBadgeFile(event.target.files?.[0] ?? null)}
-          />
-        ) : (
-          <input value={badgeUrl} onChange={(event) => setBadgeUrl(event.target.value)} placeholder="https://" required />
-        )}
-        <LocalPreview file={badgeMode === "upload" ? badgeFile : null} fallback={badgeFallback} alt="Vista previa de la insignia" />
-        <div className="form-grid two">
-          <Field label="Título de la insignia" hint="Si lo dejas vacío se usa el nombre oficial.">
-            <input value={badgeTitleText} onChange={(event) => setBadgeTitleText(event.target.value)} maxLength={220} />
-          </Field>
-          <Field label="Descripción" hint="Si la dejas vacía, no se muestra.">
-            <input value={badgeDescription} onChange={(event) => setBadgeDescription(event.target.value)} maxLength={400} />
-          </Field>
-        </div>
+        <fieldset className="control">
+          <legend>Imagen</legend>
+          <div className="choices">
+            {(
+              [
+                ["none", "Sin insignia"],
+                ["upload", "Subir archivo"],
+                ["url", "Pegar URL"],
+              ] as const
+            ).map(([value, label]) => (
+              <label key={value}>
+                <input
+                  type="radio"
+                  name="badge-mode"
+                  checked={badgeMode === value}
+                  onChange={() => setBadgeMode(value)}
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+          {badgeMode === "upload" ? (
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              onChange={(event) => setBadgeFile(event.target.files?.[0] ?? null)}
+            />
+          ) : null}
+          {badgeMode === "url" ? (
+            <input value={badgeUrl} onChange={(event) => setBadgeUrl(event.target.value)} placeholder="https://" />
+          ) : null}
+          <LocalPreview file={badgeMode === "upload" ? badgeFile : null} fallback={badgeFallback} alt="Vista previa de la insignia" />
+          <small>Si no hay imagen, el hero no muestra sello. Si la hay, sustituye al escudo.</small>
+        </fieldset>
+        <Field label="Título de la insignia" hint="Se guarda con la ficha. En la página pública se ve la imagen, no este texto.">
+          <input value={badgeTitleText} onChange={(event) => setBadgeTitleText(event.target.value)} maxLength={220} />
+        </Field>
       </section>
 
       <section className="card pad stack">

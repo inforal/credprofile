@@ -7,6 +7,7 @@ import { getAuthUserId } from "@/lib/auth";
 import { getOwnProfile, listOwnCredentials } from "@/lib/data";
 import { issuedLabel } from "@/lib/format";
 import { siteUrl } from "@/lib/site";
+import { safeHttpUrl } from "@/lib/validation";
 import type { Credential } from "@/lib/types";
 
 function storagePaths(credential: Credential): string[] {
@@ -62,8 +63,8 @@ export default async function PanelPage() {
         {credentials.length === 0 ? (
           <section className="card pad empty-state">
             <h3>Todavía no hay credenciales</h3>
-            <p className="about">
-              Cada ficha necesita insignia y PDF. Puedes subir los archivos o pegar una URL. El enlace oficial es opcional.
+              <p className="about">
+              Cada ficha necesita un PDF. La insignia es opcional: puedes subirla, pegar una URL o dejarla vacía.
             </p>
             <Link className="btn" href="/panel/credencial/nueva">
               Crear la primera
@@ -75,7 +76,9 @@ export default async function PanelPage() {
               const date = issuedLabel(credential);
               return (
                 <li className="card cred-row" key={credential.id}>
-                  <img src={credential.badge_image_url} alt={`Insignia de ${credential.title}`} />
+                  {safeHttpUrl(credential.badge_image_url) ? (
+                    <img src={credential.badge_image_url ?? ""} alt={`Insignia de ${credential.title}`} />
+                  ) : null}
                   <div className="cred-copy">
                     <strong>{credential.title}</strong>
                     <p>

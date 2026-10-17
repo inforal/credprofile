@@ -46,8 +46,8 @@ export type Credential = {
   extra_fields: ExtraField[];
   description: string | null;
   skills: string[];
-  badge_source: "upload" | "url";
-  badge_image_url: string;
+  badge_source: "upload" | "url" | null;
+  badge_image_url: string | null;
   badge_storage_path: string | null;
   badge_title: string | null;
   badge_description: string | null;
