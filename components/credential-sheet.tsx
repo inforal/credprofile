@@ -16,7 +16,7 @@ import type { Credential, ExtraField, Profile } from "@/lib/types";
 function VerifyLink({ href, label }: { href: string; label: string }) {
   return (
     <a className="verify" href={href} target="_blank" rel="noopener noreferrer">
-      {label}
+      {label} ↗
     </a>
   );
 }
@@ -114,90 +114,112 @@ export function CredentialSheet({
   ];
 
   const visibleRows = rows.filter((row): row is { label: string; value: ReactNode } => Boolean(row));
+  const hasRight = Boolean(badgeSrc || pdfSrc);
 
   return (
-    <article className="doc">
-      <p className="bread">
-        <Link href={`/${username}`}>{profile.full_name}</Link>
+    <article className="sheet">
+      <nav className="bread" aria-label="Migas de pan">
+        <Link href={`/${username}`}>Credenciales profesionales</Link>
         <span aria-hidden="true"> / </span>
-        {credential.title}
-      </p>
-      <header className={credential.show_hero_seal ? "doc-mast indexed" : "doc-mast"}>
-        <p className="eyebrow">{typeLabel}</p>
-        <h1>{hero}</h1>
-        <p className="doc-holder">{holder}</p>
-        <p className="doc-issuer">{credential.issuer_name}</p>
-      </header>
-      <div className="doc-grid">
-        <section>
-          <h2>Datos</h2>
-          <dl>
-            {visibleRows.map((row, index) => (
-              <div className="field" key={`${row.label}-${index}`}>
-                <dt>{row.label}</dt>
-                <dd>{row.value}</dd>
-              </div>
-            ))}
-          </dl>
+        <span>{credential.title}</span>
+      </nav>
+
+      <section className={credential.show_hero_seal ? "sheet-hero" : "sheet-hero plain"}>
+        {credential.show_hero_seal ? (
+          <div className="sheet-seal" aria-hidden="true">
+            <svg width="42" height="42" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2.4">
+              <path d="M32 6 54 16v16c0 12-8 20-22 26C18 52 10 44 10 32V16L32 6Z" />
+              <path d="m22 32 7 7 14-16" strokeWidth="4" />
+            </svg>
+          </div>
+        ) : null}
+        <div>
+          <p className="eyebrow">{typeLabel}</p>
+          <h1>{hero}</h1>
+          <p className="sheet-name">{holder}</p>
+          <span className="sheet-pill">{credential.issuer_name}</span>
+        </div>
+      </section>
+
+      <div className={hasRight ? "sheet-layout" : "sheet-layout solo"}>
+        <div className="sheet-stack">
+          <section className="card pad">
+            <h2>Datos de la certificación</h2>
+            <dl>
+              {visibleRows.map((row, index) => (
+                <div className="sheet-field" key={`${row.label}-${index}`}>
+                  <dt>{row.label}</dt>
+                  <dd>{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
           {description ? (
-            <div className="doc-block">
+            <section className="card pad">
               <h2>Acerca de esta certificación</h2>
               <p className="about">{description}</p>
-            </div>
+            </section>
           ) : null}
           {skills.length > 0 ? (
-            <div className="doc-block">
+            <section className="card pad">
               <h2>Skills</h2>
               <div className="skills">
                 {skills.map((skill, index) => (
                   <span key={`${skill}-${index}`}>{skill}</span>
                 ))}
               </div>
-            </div>
+            </section>
           ) : null}
-        </section>
-        {badgeSrc ? (
-          <aside className="doc-badge">
-            <h2>Insignia</h2>
-            <img src={badgeSrc} alt={`Insignia ${badgeName}`} />
-            <strong>{badgeName}</strong>
-            {badgeDescription ? <p className="badge-desc">{badgeDescription}</p> : null}
-          </aside>
+        </div>
+        {hasRight ? (
+          <div className="sheet-stack">
+            {badgeSrc ? (
+              <section className="card pad">
+                <h2>Insignia</h2>
+                <div className="sheet-badge">
+                  <img src={badgeSrc} alt={`Insignia ${badgeName}`} loading="lazy" />
+                  <div>
+                    <strong>{badgeName}</strong>
+                    {badgeDescription ? <p className="badge-desc">{badgeDescription}</p> : null}
+                  </div>
+                </div>
+              </section>
+            ) : null}
+            {pdfSrc ? (
+              <section className="card sheet-doc">
+                <div className="dochead">
+                  <h2>Certificado original</h2>
+                  <p>{pdfSubtitle(credential)}</p>
+                </div>
+                <iframe className="viewer" title={`Certificado original de ${credential.title}`} src={pdfViewerSrc(pdfSrc)} />
+              </section>
+            ) : null}
+          </div>
         ) : null}
       </div>
-      {pdfSrc ? (
-        <section className="doc-pdf">
-          <div className="dochead">
-            <h2>Certificado original</h2>
-            <p>{pdfSubtitle(credential)}</p>
-          </div>
-          <iframe className="viewer" title={`Certificado original de ${credential.title}`} src={pdfViewerSrc(pdfSrc)} />
-        </section>
-      ) : null}
+
       <footer className="issuer-footer">
         <div className="issuer-left">
-          <span>Declarado ante</span>
+          <span>Emitido por</span>
           {issuerUrl ? (
             <a className="issuer-brand" href={issuerUrl} target="_blank" rel="noopener noreferrer">
-              {logoUrl ? <img src={logoUrl} alt="" /> : null}
+              {logoUrl ? <img src={logoUrl} alt="" loading="lazy" /> : null}
               <span>{shortName}</span>
             </a>
           ) : (
             <strong className="issuer-brand">
-              {logoUrl ? <img src={logoUrl} alt="" /> : null}
+              {logoUrl ? <img src={logoUrl} alt="" loading="lazy" /> : null}
               <span>{shortName}</span>
             </strong>
           )}
         </div>
         {issuerUrl ? (
           <a className="visit-link" href={issuerUrl} target="_blank" rel="noopener noreferrer">
-            Visitar {shortName}
+            Visitar {shortName} ↗
           </a>
         ) : null}
       </footer>
-      <p className="doc-note">
-        Esta ficha recoge datos publicados por el titular. CredProfile no emite ni verifica la credencial.
-      </p>
+      <p className="doc-note">Esta ficha recoge datos publicados por el titular. CredProfile no emite ni verifica la credencial.</p>
     </article>
   );
 }

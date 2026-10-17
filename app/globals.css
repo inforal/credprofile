@@ -315,3 +315,68 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
   html { scroll-behavior: auto; }
   .mock-card { animation: none; }
 }
+
+.sheet-hero {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 28px 32px;
+  margin-bottom: 18px;
+}
+.sheet-hero.plain { display: block; }
+.sheet-hero h1 { margin: 6px 0 8px; font-size: clamp(30px, 3.4vw, 44px); letter-spacing: -0.045em; }
+.sheet-name { margin: 0 0 12px; font-size: clamp(18px, 2vw, 24px); font-weight: 650; }
+.sheet-pill {
+  display: inline-block;
+  background: #eef2ff;
+  color: var(--blue);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 720;
+}
+.sheet-seal {
+  flex: none;
+  width: 88px;
+  height: 88px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #eef2ff;
+  color: var(--blue);
+}
+.sheet-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 18px; align-items: start; }
+.sheet-layout.solo { grid-template-columns: 1fr; }
+.sheet-stack { display: flex; flex-direction: column; gap: 18px; }
+.sheet .card h2 { margin: 0 0 14px; font-size: 20px; letter-spacing: -0.03em; }
+.sheet-field { display: grid; grid-template-columns: 168px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+.sheet-field:first-child { border-top: 0; padding-top: 0; }
+.sheet-field dt { color: var(--muted); font-size: 13px; }
+.sheet-field dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.sheet-badge { display: flex; align-items: center; gap: 20px; }
+.sheet-badge img { width: 132px; height: 132px; object-fit: contain; flex: none; }
+.sheet-doc { padding: 0; overflow: hidden; }
+.sheet-doc .dochead { padding: 18px 22px; border-bottom: 1px solid var(--line); }
+.sheet-doc .dochead h2 { margin: 0 0 4px; }
+.sheet-doc .dochead p { margin: 0; color: var(--muted); font-size: 13px; }
+.sheet-doc .viewer { border-radius: 0 0 16px 16px; }
+
+@media (max-width: 900px) {
+  .sheet-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .sheet-hero { align-items: flex-start; padding: 20px; gap: 14px; }
+  .sheet-hero h1 { font-size: 28px; }
+  .sheet-name { font-size: 18px; }
+  .sheet-seal { width: 64px; height: 64px; }
+  .sheet-seal svg { width: 32px; height: 32px; }
+  .sheet-field { grid-template-columns: 1fr; gap: 4px; }
+  .sheet-badge { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .sheet-badge img { align-self: center; }
+  .sheet .issuer-footer { flex-direction: column; align-items: flex-start; }
+  .sheet .issuer-left { flex-wrap: wrap; }
+}

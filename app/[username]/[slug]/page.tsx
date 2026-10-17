@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { CopyLink } from "@/components/copy-link";
 import { CredentialSheet } from "@/components/credential-sheet";
+import { PageFooter } from "@/components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { loadPublicCredential } from "@/lib/data";
 import { clipText, holderName } from "@/lib/format";
@@ -50,6 +51,7 @@ export default async function PublicCredentialPage({
           <Link href={`/${loaded.profile.username}`}>Volver al perfil</Link>
         </div>
         <CredentialSheet username={loaded.profile.username} profile={loaded.profile} credential={loaded.credential} />
+        <PageFooter />
       </main>
     </>
   );
