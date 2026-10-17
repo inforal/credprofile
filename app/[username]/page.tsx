@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { CopyLink } from "@/components/copy-link";
 import { PageFooter } from "@/components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { loadPublicProfile } from "@/lib/data";
 import { issuedLabel } from "@/lib/format";
 import { socialMetadata } from "@/lib/seo";
+import { siteUrl } from "@/lib/site";
 import { safeHttpUrl } from "@/lib/validation";
 
 export async function generateMetadata({
@@ -43,12 +45,11 @@ export default async function PublicProfilePage({
     <>
       <SiteHeader />
       <main className="container" id="contenido">
-        {isOwner ? (
-          <p className="bread">
-            <Link href="/panel">Editar en el panel</Link>
-            {!profile.is_public ? " · Este perfil está oculto para el resto" : null}
-          </p>
-        ) : null}
+        <div className="share-line">
+          <CopyLink value={`${siteUrl()}/${profile.username}`} label="Copiar perfil" />
+          {isOwner ? <Link href="/panel">Editar en el panel</Link> : null}
+          {!profile.is_public ? <span className="pill">Oculto para el resto</span> : null}
+        </div>
         <section className={avatar ? "card hero" : "card hero plain"}>
           {avatar ? <img className="avatar" src={avatar} alt={`Foto de ${profile.full_name}`} /> : null}
           <div>

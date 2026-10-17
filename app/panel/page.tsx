@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { CopyLink } from "@/components/copy-link";
 import { DeleteCredentialButton } from "@/components/delete-credential-button";
-import { PageFooter } from "@/components/page-footer";
 import { ProfileForm } from "@/components/profile-form";
 import { getAuthUserId } from "@/lib/auth";
 import { getOwnProfile, listOwnCredentials } from "@/lib/data";
 import { issuedLabel } from "@/lib/format";
+import { siteUrl } from "@/lib/site";
 import type { Credential } from "@/lib/types";
 
 function storagePaths(credential: Credential): string[] {
@@ -29,35 +30,43 @@ export default async function PanelPage() {
     );
   }
   const credentials = await listOwnCredentials(userId);
+  const published = credentials.filter((item) => item.is_published).length;
+  const publicUrl = `${siteUrl()}/${profile.username}`;
 
   return (
     <main className="container stack" id="contenido">
       <header className="panel-intro">
         <p className="eyebrow">Panel</p>
         <h1 className="page-title">{profile.full_name}</h1>
-        <p className="muted">
-          Perfil público: <Link href={`/${profile.username}`}>/{profile.username}</Link>
-          {profile.is_public ? "" : " · oculto para el resto"}
-        </p>
+        <p className="muted">{profile.email}</p>
+        <div className="panel-meta">
+          <CopyLink value={publicUrl} />
+          <span className={profile.is_public ? "pill ok" : "pill"}>
+            {profile.is_public ? "Perfil público" : "Perfil oculto"}
+          </span>
+          <span className="pill">
+            {published} de {credentials.length} publicadas
+          </span>
+        </div>
       </header>
-      <ProfileForm profile={profile} />
-      <section className="stack" aria-labelledby="mis-credenciales">
+
+      <section className="stack" id="credenciales" aria-labelledby="mis-credenciales">
         <div className="section-head">
           <h2 className="section-heading" id="mis-credenciales">
             Credenciales
           </h2>
-          {credentials.length > 0 ? (
-            <Link className="btn" href="/panel/credencial/nueva">
-              Nueva credencial
-            </Link>
-          ) : null}
+          <Link className="btn" href="/panel/credencial/nueva">
+            Nueva credencial
+          </Link>
         </div>
         {credentials.length === 0 ? (
           <section className="card pad empty-state">
             <h3>Todavía no hay credenciales</h3>
-            <p className="about">Añade la primera con su insignia y el PDF. Puedes subir los archivos o pegar una URL.</p>
+            <p className="about">
+              Cada ficha necesita insignia y PDF. Puedes subir los archivos o pegar una URL. El enlace oficial es opcional.
+            </p>
             <Link className="btn" href="/panel/credencial/nueva">
-              Nueva credencial
+              Crear la primera
             </Link>
           </section>
         ) : (
@@ -79,7 +88,7 @@ export default async function PanelPage() {
                   </div>
                   <div className="row-actions">
                     <span className={credential.is_published ? "pill ok" : "pill"}>
-                      {credential.is_published ? "Publicada" : "No publicada"}
+                      {credential.is_published ? "Publicada" : "Borrador"}
                     </span>
                     {credential.is_published ? (
                       <Link href={`/${profile.username}/${credential.slug}`}>Ver</Link>
@@ -93,7 +102,10 @@ export default async function PanelPage() {
           </ul>
         )}
       </section>
-      <PageFooter />
+
+      <section id="perfil">
+        <ProfileForm profile={profile} />
+      </section>
     </main>
   );
 }

@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Newsreader, Outfit } from "next/font/google";
 import "./globals.css";
 import { siteUrl } from "@/lib/site";
 
-const inter = Inter({
+const outfit = Outfit({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-ui",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -14,7 +21,7 @@ export const metadata: Metadata = {
     default: "CredProfile.com",
     template: "%s | CredProfile.com",
   },
-  description: "Fichas públicas para certificaciones y credenciales profesionales.",
+  description: "Perfil público y fichas para las credenciales que tú declaras.",
   applicationName: "CredProfile",
   openGraph: {
     type: "website",
@@ -25,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#112642",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
 };
@@ -34,8 +41,8 @@ export const dynamic = "force-dynamic";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es">
-      <body className={inter.className}>
+    <html lang="es" className={`${outfit.variable} ${newsreader.variable}`}>
+      <body className={outfit.className}>
         <a className="skip" href="#contenido">
           Saltar al contenido
         </a>
