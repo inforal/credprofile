@@ -332,7 +332,7 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
 .sheet .eyebrow { font-size: 11px; margin-bottom: 8px; }
 .sheet-hero.plain { display: block; }
 .sheet-hero h1 { margin: 6px 0 8px; font-size: clamp(23px, 2.6vw, 32px); letter-spacing: -0.04em; }
-.sheet-name { margin: 0 0 10px; font-size: clamp(15px, 1.5vw, 18px); font-weight: 650; }
+.sheet-name { margin: 0 0 10px; font-size: 30px; font-weight: 400; }
 .sheet-pill {
   display: inline-block;
   background: #eef2ff;
@@ -344,12 +344,12 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
 }
 .sheet-seal {
   flex: none;
-  width: 128px;
-  height: 128px;
+  width: 160px;
+  height: 160px;
   display: grid;
   place-items: center;
 }
-.sheet-seal img { width: 128px; height: 128px; object-fit: contain; }
+.sheet-seal img { width: 160px; height: 160px; object-fit: contain; }
 .sheet-layout {
   display: grid;
   grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
@@ -391,7 +391,6 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
 @media (max-width: 520px) {
   .sheet-hero { align-items: flex-start; padding: 22px 18px; gap: 15px; }
   .sheet-hero h1 { font-size: 21px; }
-  .sheet-name { font-size: 15px; }
   .sheet-seal, .sheet-seal img { width: 88px; height: 88px; }
   .sheet-layout, .sheet-stack { gap: 15px; }
   .sheet .pad { padding: 22px 19px; }
