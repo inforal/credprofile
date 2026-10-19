@@ -284,6 +284,9 @@ input:focus, textarea:focus, select:focus { border-color: var(--blue); outline: 
 .cred-row.is-dragging { opacity: 0.55; }
 .cred-row.is-over { outline: 2px solid var(--blue); outline-offset: -2px; }
 .cred-row img, a.cred-card img { width: 64px; height: 64px; object-fit: contain; border-radius: 12px; background: var(--soft); flex: none; }
+@media (min-width: 768px) {
+  .cred-row img, a.cred-card img { width: 95px; height: auto; }
+}
 .cred-copy { flex: 1; min-width: 0; }
 .cred-copy p { margin: 2px 0 0; }
 .row-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: flex-end; }
