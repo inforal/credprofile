@@ -400,10 +400,15 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
   .sheet-layout.solo { grid-template-columns: minmax(0, 1fr); }
   .sheet .viewer { height: 600px; }
 }
+@media (max-width: 640px) {
+  .sheet-hero { align-items: flex-start; padding: 20px 16px; gap: 12px; }
+  .sheet-hero > div { min-width: 0; }
+  .sheet-hero h1 { font-size: 23px; }
+  .sheet-name { font-size: 21px; }
+  .sheet-pill { font-size: 12px; }
+  .sheet-seal, .sheet-seal img { width: 96px; height: 96px; }
+}
 @media (max-width: 520px) {
-  .sheet-hero { align-items: flex-start; padding: 22px 18px; gap: 15px; }
-  .sheet-hero h1 { font-size: 21px; }
-  .sheet-seal, .sheet-seal img { width: 88px; height: 88px; }
   .sheet-layout, .sheet-stack { gap: 15px; }
   .sheet .pad { padding: 22px 19px; }
   .sheet-field { grid-template-columns: minmax(0, 1fr); gap: 4px; }
