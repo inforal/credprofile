@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { deleteEmptyCategories } from "@/lib/categories";
 import { dbErrorMessage, FormError } from "@/lib/errors";
 import { CREDENTIAL_BUCKET, removeStoragePaths } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -29,6 +30,13 @@ export function DeleteCredentialButton({
       window.alert(new FormError(dbErrorMessage(error)).message);
       setPending(false);
       return;
+    }
+    try {
+      const { data } = await supabase.auth.getClaims();
+      const userId = data?.claims?.sub;
+      if (userId) await deleteEmptyCategories(supabase, userId);
+    } catch {
+      // La credencial ya se eliminó.
     }
     if (paths.length > 0) {
       try {

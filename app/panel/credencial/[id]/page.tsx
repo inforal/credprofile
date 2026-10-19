@@ -3,7 +3,7 @@ import { CredentialForm } from "@/components/credential-form";
 import { DeleteCredentialButton } from "@/components/delete-credential-button";
 import { PageFooter } from "@/components/page-footer";
 import { getAuthUserId } from "@/lib/auth";
-import { getOwnCredential, getOwnProfile } from "@/lib/data";
+import { getOwnCredential, getOwnProfile, listCategories } from "@/lib/data";
 
 export const metadata = {
   title: "Editar credencial",
@@ -19,8 +19,9 @@ export default async function EditCredentialPage({
   if (!userId) redirect("/entrar");
   const profile = await getOwnProfile(userId);
   if (!profile) redirect("/panel");
-  const credential = await getOwnCredential(userId, id);
+  const [credential, categories] = await Promise.all([getOwnCredential(userId, id), listCategories(userId)]);
   if (!credential) notFound();
+  const categoryName = categories.find((category) => category.id === credential.category_id)?.name ?? "";
 
   const paths = [credential.badge_storage_path, credential.pdf_storage_path, credential.issuer_logo_storage_path].filter(
     (path): path is string => Boolean(path),
@@ -35,7 +36,13 @@ export default async function EditCredentialPage({
         </div>
         <DeleteCredentialButton id={credential.id} paths={paths} redirectTo="/panel" label="Eliminar credencial" />
       </div>
-      <CredentialForm credential={credential} username={profile.username} holderFallback={profile.full_name} />
+      <CredentialForm
+        credential={credential}
+        username={profile.username}
+        holderFallback={profile.full_name}
+        categoryNames={categories.map((category) => category.name)}
+        initialCategory={categoryName}
+      />
       <PageFooter />
     </main>
   );

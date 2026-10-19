@@ -3,10 +3,12 @@ import { notFound, redirect } from "next/navigation";
 import { CopyLink } from "@/components/copy-link";
 import { PageFooter } from "@/components/page-footer";
 import { SiteHeader } from "@/components/site-header";
+import { groupByCategory } from "@/lib/categories";
 import { loadPublicProfile } from "@/lib/data";
 import { issuedLabel } from "@/lib/format";
 import { socialMetadata } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
+import type { Credential } from "@/lib/types";
 import { safeHttpUrl } from "@/lib/validation";
 
 export async function generateMetadata({
@@ -36,27 +38,40 @@ export default async function PublicProfilePage({
   if (!loaded) notFound();
   if (loaded.profile.username !== username) redirect(`/${loaded.profile.username}`);
 
-  const { profile, credentials, isOwner } = loaded;
+  const { profile, credentials, categories, isOwner } = loaded;
   const avatar = safeHttpUrl(profile.avatar_url);
   const website = safeHttpUrl(profile.website_url);
   const linkedin = safeHttpUrl(profile.linkedin_url);
+  const publicUrl = `${siteUrl()}/${profile.username}`;
+  const groups = groupByCategory(categories, credentials);
+  const showCategoryTitles = groups.some((group) => group.category);
 
   return (
     <>
       <SiteHeader />
       <main className="container" id="contenido">
-        <div className="share-line">
-          <CopyLink value={`${siteUrl()}/${profile.username}`} label="Copiar perfil" />
-          {isOwner ? <Link href="/panel">Editar en el panel</Link> : null}
-          {!profile.is_public ? <span className="pill">Oculto para el resto</span> : null}
+        <div className="profile-toolbar">
+          <span className="profile-url">
+            <LinkIcon />
+            {publicUrl.replace(/^https?:\/\//, "")}
+          </span>
+          <CopyLink value={publicUrl} label="Copiar perfil" showValue={false} buttonClassName="profile-action" />
+          {isOwner ? (
+            <Link className="profile-action" href="/panel">
+              <PencilIcon />
+              Editar en el panel
+            </Link>
+          ) : null}
+          <span className="profile-state">{profile.is_public ? "Público" : "Oculto para el resto"}</span>
         </div>
-        <section className={avatar ? "card hero" : "card hero plain"}>
-          {avatar ? <img className="avatar" src={avatar} alt={`Foto de ${profile.full_name}`} /> : null}
+
+        <section className="card profile-hero">
+          {avatar ? <img className="profile-avatar" src={avatar} alt={`Foto de ${profile.full_name}`} /> : null}
           <div>
-            <div className="eyebrow">Perfil profesional</div>
+            <p className="eyebrow">Perfil profesional</p>
             <h1>{profile.full_name}</h1>
-            {profile.headline?.trim() ? <p className="name">{profile.headline}</p> : null}
-            {profile.bio?.trim() ? <p className="about">{profile.bio}</p> : null}
+            {profile.headline?.trim() ? <p className="profile-headline">{profile.headline}</p> : null}
+            {profile.bio?.trim() ? <p className="about profile-bio">{profile.bio}</p> : null}
             {website || linkedin ? (
               <div className="profile-links">
                 {website ? (
@@ -73,7 +88,8 @@ export default async function PublicProfilePage({
             ) : null}
           </div>
         </section>
-        <section className="stack profile-block">
+
+        <section className="profile-block">
           <h2 className="section-heading">Credenciales</h2>
           {credentials.length === 0 ? (
             <section className="card pad empty-state">
@@ -81,30 +97,90 @@ export default async function PublicProfilePage({
               <p className="about">Cuando este perfil publique una certificación, aparecerá aquí.</p>
             </section>
           ) : (
-            <div className="cred-grid">
-              {credentials.map((credential) => {
-                const date = issuedLabel(credential);
-                return (
-                  <Link className="card cred-card" key={credential.id} href={`/${profile.username}/${credential.slug}`}>
-                    {safeHttpUrl(credential.badge_image_url) ? (
-                      <img src={credential.badge_image_url ?? ""} alt={`Insignia de ${credential.title}`} />
-                    ) : null}
-                    <div>
-                      <div className="eyebrow">{credential.credential_type_label}</div>
-                      <strong>{credential.title}</strong>
-                      <p className="muted">
-                        {credential.issuer_name}
-                        {date ? ` · ${date}` : ""}
-                      </p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+            groups.map((group) => (
+              <div className="profile-group" key={group.category?.id ?? "sin-categoria"}>
+                {showCategoryTitles && group.category ? <h3 className="profile-category">{group.category.name}</h3> : null}
+                <div className="profile-creds">
+                  {group.items.map((credential) => (
+                    <CredentialRow key={credential.id} username={profile.username} credential={credential} />
+                  ))}
+                </div>
+              </div>
+            ))
           )}
         </section>
         <PageFooter />
       </main>
     </>
+  );
+}
+
+function CredentialRow({ username, credential }: { username: string; credential: Credential }) {
+  const date = issuedLabel(credential);
+  const badge = safeHttpUrl(credential.badge_image_url);
+  return (
+    <Link className="card profile-cred" href={`/${username}/${credential.slug}`}>
+      {badge ? <img src={badge} alt={`Insignia de ${credential.title}`} /> : <span className="profile-badge-gap" aria-hidden="true" />}
+      <span className="profile-cred-copy">
+        <span className="profile-type">{credential.credential_type_label}</span>
+        <strong>{credential.title}</strong>
+        <span className="profile-issuer">
+          <BuildingIcon />
+          {credential.issuer_name}
+        </span>
+      </span>
+      {date ? (
+        <span className="profile-date">
+          <CalendarIcon />
+          {date}
+        </span>
+      ) : (
+        <span />
+      )}
+      <span className="profile-chevron" aria-hidden="true">
+        <ChevronIcon />
+      </span>
+    </Link>
+  );
+}
+
+function LinkIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="none" stroke="currentColor" strokeWidth="1.8" d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
+      <path fill="none" stroke="currentColor" strokeWidth="1.8" d="M14 11a5 5 0 0 0-7.1-.1l-2 2a5 5 0 0 0 7.1 7.1l1.1-1.1" />
+    </svg>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="none" stroke="currentColor" strokeWidth="1.8" d="M4 20h4l10-10-4-4L4 16v4Z" />
+    </svg>
+  );
+}
+
+function BuildingIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="none" stroke="currentColor" strokeWidth="1.8" d="M4 20h16M6 20V6h8v14M14 10h4v10M9 9h2M9 13h2" />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="none" stroke="currentColor" strokeWidth="1.8" d="M5 6h14v14H5V6Zm0 4h14M8 4v4M16 4v4" />
+    </svg>
+  );
+}
+
+function ChevronIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="none" stroke="currentColor" strokeWidth="1.8" d="m9 6 6 6-6 6" />
+    </svg>
   );
 }

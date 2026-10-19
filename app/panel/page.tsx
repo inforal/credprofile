@@ -4,7 +4,7 @@ import { CopyLink } from "@/components/copy-link";
 import { PanelCredentialList } from "@/components/panel-credential-list";
 import { ProfileForm } from "@/components/profile-form";
 import { getAuthUserId } from "@/lib/auth";
-import { getOwnProfile, listOwnCredentials } from "@/lib/data";
+import { getOwnProfile, listCategories, listOwnCredentials } from "@/lib/data";
 import { issuedLabel } from "@/lib/format";
 import { siteUrl } from "@/lib/site";
 import { safeHttpUrl } from "@/lib/validation";
@@ -30,7 +30,7 @@ export default async function PanelPage() {
       </main>
     );
   }
-  const credentials = await listOwnCredentials(userId);
+  const [credentials, categories] = await Promise.all([listOwnCredentials(userId), listCategories(userId)]);
   const published = credentials.filter((item) => item.is_published).length;
   const publicUrl = `${siteUrl()}/${profile.username}`;
 
@@ -72,6 +72,7 @@ export default async function PanelPage() {
           </section>
         ) : (
           <PanelCredentialList
+            categories={categories.map((category) => ({ id: category.id, name: category.name }))}
             items={credentials.map((credential) => ({
               id: credential.id,
               title: credential.title,
@@ -82,6 +83,7 @@ export default async function PanelPage() {
               published: credential.is_published,
               badgeUrl: safeHttpUrl(credential.badge_image_url),
               paths: storagePaths(credential),
+              categoryId: credential.category_id,
             }))}
           />
         )}

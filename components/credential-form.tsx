@@ -17,6 +17,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import type { Credential, ExtraField } from "@/lib/types";
 import { RichTextEditor } from "@/components/rich-text-editor";
+import { deleteEmptyCategories, resolveCategoryId } from "@/lib/categories";
 import { normalizeStoredDescription } from "@/lib/rich-text";
 import { blankToNull, parseSkills, safeHttpUrl, slugify, slugProblem } from "@/lib/validation";
 
@@ -40,10 +41,14 @@ export function CredentialForm({
   credential,
   username,
   holderFallback,
+  categoryNames = [],
+  initialCategory = "",
 }: {
   credential?: Credential;
   username: string;
   holderFallback: string;
+  categoryNames?: string[];
+  initialCategory?: string;
 }) {
   const router = useRouter();
   const [typeLabel, setTypeLabel] = useState(credential?.credential_type_label ?? "Certificación profesional");
@@ -81,6 +86,7 @@ export function CredentialForm({
   const [pdfSubtitleText, setPdfSubtitleText] = useState(credential?.pdf_subtitle ?? "");
   const [published, setPublished] = useState(credential?.is_published ?? true);
   const [sortOrder, setSortOrder] = useState(String(credential?.sort_order ?? 0));
+  const [categoryName, setCategoryName] = useState(initialCategory);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -229,6 +235,13 @@ export function CredentialForm({
         extraFields.push(item);
       }
 
+      let categoryId: string | null;
+      try {
+        categoryId = await resolveCategoryId(supabase, userId, categoryName);
+      } catch (error) {
+        throw new FormError(error instanceof Error ? error.message : "No se pudo guardar la categoría.");
+      }
+
       const payload = {
         slug: cleanSlug,
         credential_type_label: typeLabel.trim() || "Certificación profesional",
@@ -264,12 +277,18 @@ export function CredentialForm({
         pdf_subtitle: blankToNull(pdfSubtitleText),
         is_published: published,
         sort_order: Number.isFinite(sort) ? sort : 0,
+        category_id: categoryId,
       };
 
       const { error: saveError } = credential
         ? await supabase.from("credentials").update(payload).eq("id", credential.id)
         : await supabase.from("credentials").insert({ ...payload, id: credentialId, user_id: userId });
       if (saveError) throw new FormError(dbErrorMessage(saveError));
+      try {
+        await deleteEmptyCategories(supabase, userId);
+      } catch {
+        // La credencial ya quedó guardada.
+      }
 
       const obsolete = [...badge.remove, ...pdf.remove, ...logo.remove];
       if (obsolete.length > 0) {
@@ -327,12 +346,28 @@ export function CredentialForm({
             <input value={holderOverride} onChange={(event) => setHolderOverride(event.target.value)} maxLength={160} />
           </Field>
         </div>
+        <div className="control">
+          <span>Categoría</span>
+          <input
+            list="category-suggestions"
+            value={categoryName}
+            onChange={(event) => setCategoryName(event.target.value)}
+            maxLength={80}
+            placeholder="Por ejemplo, Estrategia"
+          />
+          <datalist id="category-suggestions">
+            {categoryNames.map((name) => (
+              <option key={name} value={name} />
+            ))}
+          </datalist>
+          <small>Opcional. Si escribes una nueva, se crea. En blanco, la credencial queda sin categoría.</small>
+        </div>
         <div className="form-grid two">
           <label className="check">
             <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
             Publicada
           </label>
-          <Field label="Orden en el perfil" hint="Los números más bajos aparecen primero.">
+          <Field label="Orden en la categoría" hint="Los números más bajos aparecen primero dentro de la categoría.">
             <input value={sortOrder} onChange={(event) => setSortOrder(event.target.value)} inputMode="numeric" />
           </Field>
         </div>

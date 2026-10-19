@@ -2,7 +2,17 @@
 
 import { useState } from "react";
 
-export function CopyLink({ value, label = "Copiar" }: { value: string; label?: string }) {
+export function CopyLink({
+  value,
+  label = "Copiar",
+  showValue = true,
+  buttonClassName = "text-button",
+}: {
+  value: string;
+  label?: string;
+  showValue?: boolean;
+  buttonClassName?: string;
+}) {
   const [done, setDone] = useState(false);
 
   async function onCopy() {
@@ -15,9 +25,9 @@ export function CopyLink({ value, label = "Copiar" }: { value: string; label?: s
   }
 
   return (
-    <span className="copy-row">
-      <code>{value.replace(/^https?:\/\//, "")}</code>
-      <button type="button" className="text-button" onClick={onCopy}>
+    <span className={showValue ? "copy-row" : "copy-only"}>
+      {showValue ? <code>{value.replace(/^https?:\/\//, "")}</code> : null}
+      <button type="button" className={buttonClassName} onClick={onCopy}>
         {done ? "Copiado" : label}
       </button>
     </span>

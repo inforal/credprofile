@@ -1,13 +1,24 @@
 import { cache } from "react";
 import { getAuthUserId } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { normalizeCredential, type Credential, type Profile } from "@/lib/types";
+import { normalizeCredential, type Credential, type CredentialCategory, type Profile } from "@/lib/types";
 
 export async function getOwnProfile(userId: string): Promise<Profile | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
   if (error) throw error;
   return (data as Profile | null) ?? null;
+}
+
+export async function listCategories(userId: string): Promise<CredentialCategory[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("credential_categories")
+    .select("*")
+    .eq("user_id", userId)
+    .order("sort_order", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as CredentialCategory[];
 }
 
 export async function listOwnCredentials(userId: string): Promise<Credential[]> {
@@ -59,8 +70,11 @@ export const loadPublicProfile = cache(async (username: string) => {
   if (!profile) return null;
   const userId = await getAuthUserId();
   if (!profile.is_public && userId !== profile.id) return null;
-  const credentials = await listPublishedCredentials(profile.id);
-  return { profile, credentials, isOwner: userId === profile.id };
+  const [credentials, categories] = await Promise.all([
+    listPublishedCredentials(profile.id),
+    listCategories(profile.id),
+  ]);
+  return { profile, credentials, categories, isOwner: userId === profile.id };
 });
 
 export const loadPublicCredential = cache(async (username: string, slug: string) => {

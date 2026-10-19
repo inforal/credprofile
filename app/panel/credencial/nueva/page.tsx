@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { CredentialForm } from "@/components/credential-form";
 import { PageFooter } from "@/components/page-footer";
 import { getAuthUserId } from "@/lib/auth";
-import { getOwnProfile } from "@/lib/data";
+import { getOwnProfile, listCategories } from "@/lib/data";
 
 export const metadata = {
   title: "Nueva credencial",
@@ -13,6 +13,7 @@ export default async function NewCredentialPage() {
   if (!userId) redirect("/entrar");
   const profile = await getOwnProfile(userId);
   if (!profile) redirect("/panel");
+  const categories = await listCategories(userId);
 
   return (
     <main className="container stack" id="contenido">
@@ -20,7 +21,11 @@ export default async function NewCredentialPage() {
         <h1 className="page-title">Nueva credencial</h1>
         <p className="intro">La insignia y el PDF son obligatorios. Puedes subir cada archivo o pegar su URL.</p>
       </div>
-      <CredentialForm username={profile.username} holderFallback={profile.full_name} />
+      <CredentialForm
+        username={profile.username}
+        holderFallback={profile.full_name}
+        categoryNames={categories.map((category) => category.name)}
+      />
       <PageFooter />
     </main>
   );

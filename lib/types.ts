@@ -20,6 +20,15 @@ export type Profile = {
   updated_at: string;
 };
 
+export type CredentialCategory = {
+  id: string;
+  user_id: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Credential = {
   id: string;
   user_id: string;
@@ -57,6 +66,7 @@ export type Credential = {
   pdf_subtitle: string | null;
   is_published: boolean;
   sort_order: number;
+  category_id: string | null;
   created_at: string;
   updated_at: string;
 };
