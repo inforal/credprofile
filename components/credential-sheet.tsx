@@ -111,7 +111,7 @@ export function CredentialSheet({
   ];
 
   const visibleRows = rows.filter((row): row is { label: string; value: ReactNode } => Boolean(row));
-  const hasRight = Boolean(pdfSrc);
+  const hasRight = Boolean(pdfSrc || skills.length > 0);
 
   return (
     <article className="sheet">
@@ -154,16 +154,6 @@ export function CredentialSheet({
               <p className="about">{description}</p>
             </section>
           ) : null}
-          {skills.length > 0 ? (
-            <section className="card pad">
-              <h2>Skills</h2>
-              <div className="skills">
-                {skills.map((skill, index) => (
-                  <span key={`${skill}-${index}`}>{skill}</span>
-                ))}
-              </div>
-            </section>
-          ) : null}
         </div>
         {hasRight ? (
           <div className="sheet-stack">
@@ -174,6 +164,16 @@ export function CredentialSheet({
                   <p>{pdfSubtitle(credential)}</p>
                 </div>
                 <iframe className="viewer" title={`Certificado original de ${credential.title}`} src={pdfViewerSrc(pdfSrc)} />
+              </section>
+            ) : null}
+            {skills.length > 0 ? (
+              <section className="card pad">
+                <h2>Skills</h2>
+                <div className="skills">
+                  {skills.map((skill, index) => (
+                    <span key={`${skill}-${index}`}>{skill}</span>
+                  ))}
+                </div>
               </section>
             ) : null}
           </div>
@@ -201,7 +201,6 @@ export function CredentialSheet({
           </a>
         ) : null}
       </footer>
-      <p className="doc-note">Esta ficha recoge datos publicados por el titular. CredProfile no emite ni verifica la credencial.</p>
     </article>
   );
 }

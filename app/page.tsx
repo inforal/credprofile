@@ -2,11 +2,11 @@ import Link from "next/link";
 import { Mark } from "@/components/mark";
 import { SiteFooter } from "@/components/page-footer";
 import { SiteHeader } from "@/components/site-header";
+import { WaitlistButton } from "@/components/waitlist-button";
 import { getAuthUserId } from "@/lib/auth";
 import { getOwnProfile } from "@/lib/data";
 
-const description =
-  "Un perfil público y una ficha por cada credencial que tú declaras. CredProfile no emite ni verifica títulos.";
+const description = "Un perfil público y una ficha por cada credencial.";
 
 export const metadata = {
   title: { absolute: "CredProfile.com" },
@@ -44,9 +44,7 @@ export default async function HomePage() {
           ) : (
             <>
               <Link href="/entrar">Entrar</Link>
-              <Link className="btn" href="/registro">
-                Crear perfil
-              </Link>
+              <WaitlistButton className="btn">Crear perfil</WaitlistButton>
             </>
           )
         }
@@ -57,8 +55,8 @@ export default async function HomePage() {
             <p className="eyebrow">Perfil público de credenciales</p>
             <h1>Todas tus credenciales, en un perfil que se puede compartir.</h1>
             <p className="lede">
-              Cada certificación tiene su propia ficha. Tú publicas los datos, la insignia y el PDF. Si hay una página
-              oficial, el enlace lo añades tú. CredProfile no emite ni verifica.
+              Cada certificación tiene su propia ficha, con sus datos, la insignia, el PDF y el enlace oficial si lo
+              añades.
             </p>
             <div className="actions">
               {profile ? (
@@ -72,9 +70,7 @@ export default async function HomePage() {
                 </>
               ) : (
                 <>
-                  <Link className="btn" href="/registro">
-                    Crear perfil
-                  </Link>
+                  <WaitlistButton className="btn">Crear perfil</WaitlistButton>
                   <Link className="btn secondary" href="/entrar">
                     Entrar
                   </Link>
@@ -140,7 +136,7 @@ export default async function HomePage() {
           </article>
           <article>
             <h2>Enlace oficial, si quieres</h2>
-            <p>Puedes apuntar a la página del emisor. No contrastamos ese enlace ni damos el título por válido.</p>
+            <p>Puedes apuntar a la página del emisor. El enlace se abre en su web.</p>
           </article>
         </section>
 
@@ -174,7 +170,7 @@ export default async function HomePage() {
         <section className="band alt" id="como-funciona">
           <div className="band-copy">
             <p className="eyebrow">Cómo funciona</p>
-            <h2>Tres pasos, sin intermediarios.</h2>
+            <h2>Tres pasos.</h2>
           </div>
           <ol className="steps">
             <li>
@@ -199,7 +195,7 @@ export default async function HomePage() {
           <div className="band-copy">
             <p className="eyebrow">Control</p>
             <h2>Tú decides qué se ve.</h2>
-            <p>CredProfile guarda lo que publicas. No actúa como entidad emisora ni como verificador.</p>
+            <p>El perfil y cada ficha muestran lo que has marcado como visible.</p>
           </div>
           <ul className="safe-list">
             <li>El perfil puede ocultarse entero.</li>
@@ -212,7 +208,7 @@ export default async function HomePage() {
         <section className="cta-band">
           <div>
             <h2>Empieza por una ficha.</h2>
-            <p>Crea el perfil, declara una credencial y comparte la dirección cuando esté lista.</p>
+            <p>Crea el perfil, añade una credencial y comparte la dirección cuando esté lista.</p>
           </div>
           <div className="actions">
             {profile ? (
@@ -221,9 +217,7 @@ export default async function HomePage() {
               </Link>
             ) : (
               <>
-                <Link className="btn light" href="/registro">
-                  Crear perfil
-                </Link>
+                <WaitlistButton className="btn light">Crear perfil</WaitlistButton>
                 <Link className="btn secondary light-ghost" href="/entrar">
                   Entrar
                 </Link>

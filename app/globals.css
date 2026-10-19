@@ -385,6 +385,21 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
 .sheet .issuer-footer { font-size: 13px; }
 .sheet .issuer-brand { font-size: 14px; }
 .sheet .doc-note { font-size: 11px; }
+
+.waitlist-backdrop {
+  position: fixed; inset: 0; z-index: 70;
+  display: grid; place-items: center; padding: 24px;
+  background: rgba(14, 27, 61, 0.48);
+}
+.waitlist-dialog { position: relative; width: min(440px, 100%); }
+.waitlist-close { position: absolute; top: 18px; right: 18px; z-index: 1; }
+.waitlist-card {
+  background: white; border: 1px solid var(--line); border-radius: 20px;
+  box-shadow: var(--shadow); padding: 28px;
+}
+.waitlist-card h2 { margin: 0 0 8px; font-size: 28px; }
+.waitlist-page { display: grid; place-items: center; min-height: 52vh; padding: 24px 0 8px; }
+.waitlist-page .waitlist-card { width: min(440px, 100%); }
 .sheet .viewer {
   display: block;
   width: 100%;

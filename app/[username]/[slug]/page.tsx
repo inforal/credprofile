@@ -20,7 +20,7 @@ export async function generateMetadata({
   const holder = holderName(loaded.profile.full_name, loaded.credential.holder_name_override);
   const description =
     clipText(loaded.credential.description ?? "", 180) ||
-    `${loaded.credential.title} de ${holder}. Ficha publicada por el titular.`;
+    `${loaded.credential.title} de ${holder}.`;
   const title = `${loaded.credential.title} · ${holder}`;
   return socialMetadata({
     title,

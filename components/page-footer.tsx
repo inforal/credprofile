@@ -9,7 +9,7 @@ export function SiteFooter() {
           <Mark size={24} />
           <span>CredProfile</span>
         </Link>
-        <p>Perfil público y fichas para las credenciales que tú declaras.</p>
+        <p>Perfil público y fichas para tus credenciales.</p>
       </div>
       <nav aria-label="Producto">
         <p>Producto</p>
@@ -23,7 +23,7 @@ export function SiteFooter() {
         <Link href="/entrar">Entrar</Link>
         <Link href="/panel">Panel</Link>
       </nav>
-      <p className="foot-copy">© {new Date().getFullYear()} CredProfile.com. No emitimos ni verificamos credenciales.</p>
+      <p className="foot-copy">© {new Date().getFullYear()} CredProfile.com</p>
     </footer>
   );
 }

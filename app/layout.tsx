@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: "CredProfile.com",
     template: "%s | CredProfile.com",
   },
-  description: "Perfil público y fichas para las credenciales que tú declaras. CredProfile no emite ni verifica.",
+  description: "Perfil público y fichas para tus credenciales.",
   applicationName: "CredProfile",
   openGraph: {
     type: "website",
