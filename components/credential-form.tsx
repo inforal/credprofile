@@ -16,6 +16,8 @@ import {
 } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import type { Credential, ExtraField } from "@/lib/types";
+import { RichTextEditor } from "@/components/rich-text-editor";
+import { normalizeStoredDescription } from "@/lib/rich-text";
 import { blankToNull, parseSkills, safeHttpUrl, slugify, slugProblem } from "@/lib/validation";
 
 const IMAGE_EXT = ["png", "jpg", "webp", "svg"];
@@ -139,6 +141,11 @@ export function CredentialForm({
       setError("El enlace de verificación debe empezar por http:// o https://.");
       return;
     }
+    const storedDescription = normalizeStoredDescription(description);
+    if (storedDescription && storedDescription.length > 8000) {
+      setError("La descripción supera el máximo de 8000 caracteres.");
+      return;
+    }
     const sort = Number.parseInt(sortOrder, 10);
 
     setPending(true);
@@ -244,7 +251,7 @@ export function CredentialForm({
         verification_url: verifyLink,
         verification_label: blankToNull(verificationText),
         extra_fields: extraFields,
-        description: blankToNull(description),
+        description: storedDescription,
         skills: parseSkills(skills),
         badge_source: badge.source,
         badge_image_url: badge.url,
@@ -462,9 +469,11 @@ export function CredentialForm({
 
       <section className="card pad stack">
         <h2>Descripción y skills</h2>
-        <Field label="Acerca de esta certificación" hint="Si lo dejas vacío, esa tarjeta no se muestra.">
-          <textarea value={description} onChange={(event) => setDescription(event.target.value)} maxLength={8000} />
-        </Field>
+        <div className="control">
+          <span>Acerca de esta certificación</span>
+          <RichTextEditor value={description} onChange={setDescription} />
+          <small>Negrita, cursiva, listas y enlaces. Si lo dejas vacío, esa tarjeta no se muestra.</small>
+        </div>
         <Field label="Skills" hint="Una competencia por línea. Si no hay ninguna, la sección no se muestra.">
           <textarea value={skills} onChange={(event) => setSkills(event.target.value)} />
         </Field>

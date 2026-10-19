@@ -6,6 +6,7 @@ import { PageFooter } from "@/components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { loadPublicCredential } from "@/lib/data";
 import { clipText, holderName } from "@/lib/format";
+import { descriptionToPlain } from "@/lib/rich-text";
 import { socialMetadata } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
@@ -19,7 +20,7 @@ export async function generateMetadata({
   if (!loaded) return { title: "Credencial no encontrada" };
   const holder = holderName(loaded.profile.full_name, loaded.credential.holder_name_override);
   const description =
-    clipText(loaded.credential.description ?? "", 180) ||
+    clipText(descriptionToPlain(loaded.credential.description ?? ""), 180) ||
     `${loaded.credential.title} de ${holder}.`;
   const title = `${loaded.credential.title} · ${holder}`;
   return socialMetadata({

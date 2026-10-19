@@ -9,8 +9,16 @@ import {
   pdfViewerSrc,
   verificationLabel,
 } from "@/lib/format";
+import { descriptionIsEmpty, looksLikeHtml, sanitizeDescription } from "@/lib/rich-text";
 import { safeHttpUrl } from "@/lib/validation";
 import type { Credential, ExtraField, Profile } from "@/lib/types";
+
+function DescriptionBody({ value }: { value: string }) {
+  if (!looksLikeHtml(value)) return <p className="about">{value}</p>;
+  const safe = sanitizeDescription(value);
+  if (descriptionIsEmpty(safe)) return null;
+  return <div className="about rich" dangerouslySetInnerHTML={{ __html: safe }} />;
+}
 
 function VerifyLink({ href, label }: { href: string; label: string }) {
   return (
@@ -151,7 +159,7 @@ export function CredentialSheet({
           {description ? (
             <section className="card pad">
               <h2>Acerca de esta certificación</h2>
-              <p className="about">{description}</p>
+              <DescriptionBody value={description} />
             </section>
           ) : null}
         </div>
