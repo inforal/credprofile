@@ -185,11 +185,13 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         {avatarMode === "url" ? (
           <input value={avatarUrl} onChange={(event) => setAvatarUrl(event.target.value)} placeholder="https://" />
         ) : null}
-        <LocalPreview
-          file={avatarMode === "upload" ? avatarFile : null}
-          fallback={avatarFallback}
-          alt="Vista previa de la foto"
-        />
+        <div className="avatar-preview">
+          <LocalPreview
+            file={avatarMode === "upload" ? avatarFile : null}
+            fallback={avatarFallback}
+            alt="Vista previa de la foto"
+          />
+        </div>
       </fieldset>
       <label className="check">
         <input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} />
