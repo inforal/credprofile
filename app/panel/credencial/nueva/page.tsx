@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { CredentialForm } from "@/components/credential-form";
 import { PageFooter } from "@/components/page-footer";
 import { getAuthUserId } from "@/lib/auth";
-import { getOwnProfile, listCategories } from "@/lib/data";
+import { getOwnProfile, listCategories, listOwnCredentials } from "@/lib/data";
+import { issuerPresets } from "@/lib/issuers";
 
 export const metadata = {
   title: "Nueva credencial",
@@ -13,7 +14,7 @@ export default async function NewCredentialPage() {
   if (!userId) redirect("/entrar");
   const profile = await getOwnProfile(userId);
   if (!profile) redirect("/panel");
-  const categories = await listCategories(userId);
+  const [categories, credentials] = await Promise.all([listCategories(userId), listOwnCredentials(userId)]);
 
   return (
     <main className="container stack" id="contenido">
@@ -25,6 +26,7 @@ export default async function NewCredentialPage() {
         username={profile.username}
         holderFallback={profile.full_name}
         categoryNames={categories.map((category) => category.name)}
+        issuers={issuerPresets(credentials)}
       />
       <PageFooter />
     </main>

@@ -436,10 +436,27 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
 .waitlist-dialog { position: relative; width: min(440px, 100%); }
 .waitlist-close { position: absolute; top: 18px; right: 18px; z-index: 1; }
 .waitlist-card {
-  background: white; border: 1px solid var(--line); border-radius: 20px;
+  background: white; color: var(--ink); border: 1px solid var(--line); border-radius: 20px;
   box-shadow: var(--shadow); padding: 28px;
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 }
-.waitlist-card h2 { margin: 0 0 8px; font-size: 28px; }
+.waitlist-card h2 { margin: 0 0 8px; font-size: 28px; color: var(--ink); }
+.waitlist-card .eyebrow { color: var(--blue); }
+.waitlist-card .about { color: #243352; }
+.waitlist-card input { color: var(--ink); background: white; }
+.issuer-combo { position: relative; }
+.issuer-options {
+  position: absolute; z-index: 8; left: 0; right: 0; top: calc(100% + 4px);
+  margin: 0; padding: 6px; list-style: none; background: white; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+  max-height: 240px; overflow: auto;
+}
+.issuer-options button {
+  display: block; width: 100%; text-align: left; border: 0; border-radius: 8px;
+  background: transparent; color: var(--ink); padding: 8px 10px; font-weight: 650; cursor: pointer;
+}
+.issuer-options button[aria-selected="true"],
+.issuer-options button:hover { background: #eef2ff; color: var(--blue); }
 .waitlist-page { display: grid; place-items: center; min-height: 52vh; padding: 24px 0 8px; }
 .waitlist-page .waitlist-card { width: min(440px, 100%); }
 .sheet .viewer {

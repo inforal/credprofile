@@ -40,7 +40,24 @@ export function DeleteCredentialButton({
     }
     if (paths.length > 0) {
       try {
-        await removeStoragePaths(supabase, CREDENTIAL_BUCKET, paths);
+        let removable = paths;
+        const { data: claims } = await supabase.auth.getClaims();
+        const userId = claims?.claims?.sub;
+        if (userId) {
+          const { data: remaining } = await supabase
+            .from("credentials")
+            .select("badge_storage_path, pdf_storage_path, issuer_logo_storage_path")
+            .eq("user_id", userId);
+          const stillUsed = new Set(
+            (remaining ?? []).flatMap((row) =>
+              [row.badge_storage_path, row.pdf_storage_path, row.issuer_logo_storage_path].filter(
+                (path): path is string => Boolean(path),
+              ),
+            ),
+          );
+          removable = paths.filter((path) => !stillUsed.has(path));
+        }
+        await removeStoragePaths(supabase, CREDENTIAL_BUCKET, removable);
       } catch {
         // La credencial ya se eliminó.
       }

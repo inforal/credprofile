@@ -3,7 +3,8 @@ import { CredentialForm } from "@/components/credential-form";
 import { DeleteCredentialButton } from "@/components/delete-credential-button";
 import { PageFooter } from "@/components/page-footer";
 import { getAuthUserId } from "@/lib/auth";
-import { getOwnCredential, getOwnProfile, listCategories } from "@/lib/data";
+import { getOwnCredential, getOwnProfile, listCategories, listOwnCredentials } from "@/lib/data";
+import { issuerPresets } from "@/lib/issuers";
 
 export const metadata = {
   title: "Editar credencial",
@@ -19,7 +20,11 @@ export default async function EditCredentialPage({
   if (!userId) redirect("/entrar");
   const profile = await getOwnProfile(userId);
   if (!profile) redirect("/panel");
-  const [credential, categories] = await Promise.all([getOwnCredential(userId, id), listCategories(userId)]);
+  const [credential, categories, credentials] = await Promise.all([
+    getOwnCredential(userId, id),
+    listCategories(userId),
+    listOwnCredentials(userId),
+  ]);
   if (!credential) notFound();
   const categoryName = categories.find((category) => category.id === credential.category_id)?.name ?? "";
 
@@ -42,6 +47,7 @@ export default async function EditCredentialPage({
         holderFallback={profile.full_name}
         categoryNames={categories.map((category) => category.name)}
         initialCategory={categoryName}
+        issuers={issuerPresets(credentials)}
       />
       <PageFooter />
     </main>

@@ -18,6 +18,8 @@ import { createClient } from "@/lib/supabase/client";
 import type { Credential, ExtraField } from "@/lib/types";
 import { RichTextEditor } from "@/components/rich-text-editor";
 import { deleteEmptyCategories, resolveCategoryId } from "@/lib/categories";
+import { IssuerNameField } from "@/components/issuer-name-field";
+import type { IssuerPreset } from "@/lib/issuers";
 import { normalizeStoredDescription } from "@/lib/rich-text";
 import { blankToNull, parseSkills, safeHttpUrl, slugify, slugProblem } from "@/lib/validation";
 
@@ -43,12 +45,14 @@ export function CredentialForm({
   holderFallback,
   categoryNames = [],
   initialCategory = "",
+  issuers = [],
 }: {
   credential?: Credential;
   username: string;
   holderFallback: string;
   categoryNames?: string[];
   initialCategory?: string;
+  issuers?: IssuerPreset[];
 }) {
   const router = useRouter();
   const [typeLabel, setTypeLabel] = useState(credential?.credential_type_label ?? "Certificación profesional");
@@ -65,6 +69,11 @@ export function CredentialForm({
     credential?.issuer_logo_source === "url" ? (credential.issuer_logo_url ?? "") : "",
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [pickedLogo, setPickedLogo] = useState<{
+    source: "upload" | "url" | null;
+    url: string | null;
+    path: string | null;
+  } | null>(null);
   const [issuedDate, setIssuedDate] = useState(credential?.issued_date ?? "");
   const [issuedText, setIssuedText] = useState(credential?.issued_date_text ?? "");
   const [expiration, setExpiration] = useState(credential?.expiration_date ?? "");
@@ -100,12 +109,28 @@ export function CredentialForm({
         : null;
   const logoFallback =
     logoMode === "upload"
-      ? credential?.issuer_logo_source === "upload"
-        ? credential.issuer_logo_url
-        : null
+      ? pickedLogo?.source === "upload"
+        ? pickedLogo.url
+        : credential?.issuer_logo_source === "upload"
+          ? credential.issuer_logo_url
+          : null
       : logoMode === "url"
         ? safeHttpUrl(logoUrl)
         : null;
+
+  function applyIssuer(issuer: IssuerPreset) {
+    setIssuerName(issuer.name);
+    setIssuerShort(issuer.shortName ?? "");
+    setIssuerUrl(issuer.url ?? "");
+    setLogoFile(null);
+    setLogoMode(issuer.logoSource ?? "none");
+    setLogoUrl(issuer.logoSource === "url" ? (issuer.logoUrl ?? "") : "");
+    setPickedLogo({
+      source: issuer.logoSource,
+      url: issuer.logoUrl,
+      path: issuer.logoPath,
+    });
+  }
 
   function onTitleChange(value: string) {
     setTitle(value);
@@ -205,9 +230,9 @@ export function CredentialForm({
         url: logoUrl,
         allowed: LOGO_EXT,
         maxBytes: FILE_MAX,
-        existingSource: credential?.issuer_logo_source ?? null,
-        existingUrl: credential?.issuer_logo_url ?? null,
-        existingPath: credential?.issuer_logo_storage_path ?? null,
+        existingSource: pickedLogo ? pickedLogo.source : (credential?.issuer_logo_source ?? null),
+        existingUrl: pickedLogo ? pickedLogo.url : (credential?.issuer_logo_url ?? null),
+        existingPath: pickedLogo ? pickedLogo.path : (credential?.issuer_logo_storage_path ?? null),
         pathForExtension: (extension) => issuerLogoPath(userId, credentialId, extension),
         required: false,
         missingMessage: "Sube el logo o pega su URL.",
@@ -290,7 +315,12 @@ export function CredentialForm({
         // La credencial ya quedó guardada.
       }
 
-      const obsolete = [...badge.remove, ...pdf.remove, ...logo.remove];
+      const ownedPrefix = `${userId}/${credentialId}/`;
+      const obsolete = [
+        ...badge.remove,
+        ...pdf.remove,
+        ...logo.remove.filter((path) => path.startsWith(ownedPrefix)),
+      ];
       if (obsolete.length > 0) {
         try {
           await removeStoragePaths(supabase, CREDENTIAL_BUCKET, obsolete);
@@ -375,9 +405,12 @@ export function CredentialForm({
 
       <section className="card pad stack">
         <h2>Entidad emisora</h2>
-        <Field label="Nombre">
-          <input value={issuerName} onChange={(event) => setIssuerName(event.target.value)} required maxLength={220} />
-        </Field>
+        <IssuerNameField
+          value={issuerName}
+          issuers={issuers}
+          onChange={setIssuerName}
+          onPick={applyIssuer}
+        />
         <div className="form-grid two">
           <Field label="Nombre corto" hint="Si lo dejas vacío, el pie usa el nombre completo.">
             <input value={issuerShort} onChange={(event) => setIssuerShort(event.target.value)} maxLength={160} />
