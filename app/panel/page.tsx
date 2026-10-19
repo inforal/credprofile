@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CopyLink } from "@/components/copy-link";
-import { DeleteCredentialButton } from "@/components/delete-credential-button";
+import { PanelCredentialList } from "@/components/panel-credential-list";
 import { ProfileForm } from "@/components/profile-form";
 import { getAuthUserId } from "@/lib/auth";
 import { getOwnProfile, listOwnCredentials } from "@/lib/data";
@@ -71,38 +71,19 @@ export default async function PanelPage() {
             </Link>
           </section>
         ) : (
-          <ul className="cred-list">
-            {credentials.map((credential) => {
-              const date = issuedLabel(credential);
-              return (
-                <li className="card cred-row" key={credential.id}>
-                  {safeHttpUrl(credential.badge_image_url) ? (
-                    <img src={credential.badge_image_url ?? ""} alt={`Insignia de ${credential.title}`} />
-                  ) : null}
-                  <div className="cred-copy">
-                    <strong>{credential.title}</strong>
-                    <p>
-                      {credential.issuer_name}
-                      {date ? ` · ${date}` : ""}
-                    </p>
-                    <p className="muted">
-                      /{profile.username}/{credential.slug}
-                    </p>
-                  </div>
-                  <div className="row-actions">
-                    <span className={credential.is_published ? "pill ok" : "pill"}>
-                      {credential.is_published ? "Publicada" : "Borrador"}
-                    </span>
-                    {credential.is_published ? (
-                      <Link href={`/${profile.username}/${credential.slug}`}>Ver</Link>
-                    ) : null}
-                    <Link href={`/panel/credencial/${credential.id}`}>Editar</Link>
-                    <DeleteCredentialButton id={credential.id} paths={storagePaths(credential)} />
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+          <PanelCredentialList
+            items={credentials.map((credential) => ({
+              id: credential.id,
+              title: credential.title,
+              issuer: credential.issuer_name,
+              date: issuedLabel(credential),
+              username: profile.username,
+              slug: credential.slug,
+              published: credential.is_published,
+              badgeUrl: safeHttpUrl(credential.badge_image_url),
+              paths: storagePaths(credential),
+            }))}
+          />
         )}
       </section>
 
