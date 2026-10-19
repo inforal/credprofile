@@ -5,7 +5,7 @@ import { PageFooter } from "@/components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { groupByCategory } from "@/lib/categories";
 import { loadPublicProfile } from "@/lib/data";
-import { issuedLabel } from "@/lib/format";
+import { issuedLabel, nameInitials } from "@/lib/format";
 import { socialMetadata } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 import type { Credential } from "@/lib/types";
@@ -66,7 +66,13 @@ export default async function PublicProfilePage({
         </div>
 
         <section className="card profile-hero">
-          {avatar ? <img className="profile-avatar" src={avatar} alt={`Foto de ${profile.full_name}`} /> : null}
+          {avatar ? (
+            <img className="profile-avatar" src={avatar} alt={`Foto de ${profile.full_name}`} />
+          ) : (
+            <span className="profile-avatar profile-avatar-initials" aria-hidden="true">
+              {nameInitials(profile.full_name)}
+            </span>
+          )}
           <div>
             <p className="eyebrow">Perfil profesional</p>
             <h1>{profile.full_name}</h1>
