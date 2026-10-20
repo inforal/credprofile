@@ -149,17 +149,13 @@ export function CredentialSheet({
   return (
     <article className="sheet">
       <section className={badgeSrc ? "sheet-hero" : "sheet-hero plain"}>
-        <div className="sheet-hero-side">
-          {badgeSrc ? (
+        {badgeSrc ? (
+          <div className="sheet-hero-side">
             <div className="sheet-ring">
               <img src={badgeSrc} alt={`Insignia de ${credential.title}`} />
             </div>
-          ) : null}
-          <span className="sheet-issuer-pill">
-            <BuildingIcon />
-            <span>{shortName}</span>
-          </span>
-        </div>
+          </div>
+        ) : null}
         <div className="sheet-hero-main">
           <p className="sheet-type-pill">{typeLabel}</p>
           <h1>{hero}</h1>
