@@ -74,7 +74,7 @@ export default async function PublicProfilePage({
             </span>
           )}
           <div>
-            <p className="eyebrow">Perfil profesional</p>
+            <p className="eyebrow">Perfil de credenciales profesionales</p>
             <h1>{profile.full_name}</h1>
             {profile.headline?.trim() ? <p className="profile-headline">{profile.headline}</p> : null}
             {profile.bio?.trim() ? <p className="about profile-bio">{profile.bio}</p> : null}
@@ -96,7 +96,6 @@ export default async function PublicProfilePage({
         </section>
 
         <section className="profile-block">
-          <h2 className="section-heading">Credenciales</h2>
           {credentials.length === 0 ? (
             <section className="card pad empty-state">
               <h3>No hay credenciales publicadas</h3>

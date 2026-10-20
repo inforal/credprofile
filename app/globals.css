@@ -501,16 +501,9 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
 .profile-action { cursor: pointer; color: var(--blue); background: #eef2ff; border-color: #d5defb; }
 .profile-state { color: #3d4d6b; background: var(--soft); }
 .profile-hero {
-  position: relative; overflow: hidden; display: flex; gap: 22px; align-items: center;
-  padding: 28px 32px; margin-bottom: 28px;
+  display: flex; gap: 22px; align-items: center;
+  padding: 28px 32px; margin-bottom: 28px; background: #f3f8fd;
 }
-.profile-hero::after {
-  content: ""; position: absolute; right: -80px; top: -90px; width: 460px; height: 320px; pointer-events: none;
-  background:
-    radial-gradient(circle at 40% 45%, rgba(36, 84, 230, 0.16), transparent 62%),
-    linear-gradient(135deg, transparent 20%, rgba(227, 106, 82, 0.1));
-}
-.profile-hero > * { position: relative; z-index: 1; }
 .profile-avatar {
   width: 112px; height: 112px; border-radius: 50%; object-fit: cover; flex: none;
   box-shadow: 0 8px 24px rgba(18, 32, 71, 0.08);
