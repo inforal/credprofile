@@ -132,17 +132,15 @@ function CredentialRow({ username, credential }: { username: string; credential:
         <strong>{credential.title}</strong>
         <span className="profile-issuer">
           <BuildingIcon />
-          {credential.issuer_name}
+          <span>{credential.issuer_name}</span>
         </span>
+        {date ? (
+          <span className="profile-date">
+            <CalendarIcon />
+            <span>{date}</span>
+          </span>
+        ) : null}
       </span>
-      {date ? (
-        <span className="profile-date">
-          <CalendarIcon />
-          {date}
-        </span>
-      ) : (
-        <span />
-      )}
       <span className="profile-chevron" aria-hidden="true">
         <ChevronIcon />
       </span>
