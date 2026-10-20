@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { CopyLink } from "@/components/copy-link";
 import { PageFooter } from "@/components/page-footer";
 import { SiteHeader } from "@/components/site-header";
 import { groupByCategory } from "@/lib/categories";
 import { loadPublicProfile } from "@/lib/data";
 import { issuedLabel, nameInitials } from "@/lib/format";
 import { socialMetadata } from "@/lib/seo";
-import { siteUrl } from "@/lib/site";
 import type { Credential } from "@/lib/types";
 import { safeHttpUrl } from "@/lib/validation";
 
@@ -38,11 +36,10 @@ export default async function PublicProfilePage({
   if (!loaded) notFound();
   if (loaded.profile.username !== username) redirect(`/${loaded.profile.username}`);
 
-  const { profile, credentials, categories, isOwner } = loaded;
+  const { profile, credentials, categories } = loaded;
   const avatar = safeHttpUrl(profile.avatar_url);
   const website = safeHttpUrl(profile.website_url);
   const linkedin = safeHttpUrl(profile.linkedin_url);
-  const publicUrl = `${siteUrl()}/${profile.username}`;
   const groups = groupByCategory(categories, credentials);
   const showCategoryTitles = groups.some((group) => group.category);
 
@@ -50,21 +47,6 @@ export default async function PublicProfilePage({
     <>
       <SiteHeader />
       <main className="container" id="contenido">
-        <div className="profile-toolbar">
-          <span className="profile-url">
-            <LinkIcon />
-            {publicUrl.replace(/^https?:\/\//, "")}
-          </span>
-          <CopyLink value={publicUrl} label="Copiar perfil" showValue={false} buttonClassName="profile-action" />
-          {isOwner ? (
-            <Link className="profile-action" href="/panel">
-              <PencilIcon />
-              Editar en el panel
-            </Link>
-          ) : null}
-          <span className="profile-state">{profile.is_public ? "Público" : "Oculto para el resto"}</span>
-        </div>
-
         <section className="card profile-hero">
           {avatar ? (
             <img className="profile-avatar" src={avatar} alt={`Foto de ${profile.full_name}`} />
@@ -144,23 +126,6 @@ function CredentialRow({ username, credential }: { username: string; credential:
         <ChevronIcon />
       </span>
     </Link>
-  );
-}
-
-function LinkIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="none" stroke="currentColor" strokeWidth="1.8" d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
-      <path fill="none" stroke="currentColor" strokeWidth="1.8" d="M14 11a5 5 0 0 0-7.1-.1l-2 2a5 5 0 0 0 7.1 7.1l1.1-1.1" />
-    </svg>
-  );
-}
-
-function PencilIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="none" stroke="currentColor" strokeWidth="1.8" d="M4 20h4l10-10-4-4L4 16v4Z" />
-    </svg>
   );
 }
 

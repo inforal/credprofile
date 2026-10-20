@@ -5,6 +5,7 @@ import {
   holderName,
   issuedLabel,
   issuerShortName,
+  nameInitials,
   pdfSubtitle,
   pdfViewerSrc,
   verificationLabel,
@@ -66,6 +67,7 @@ export function CredentialSheet({
   const description = credential.description?.trim() ?? "";
   const skills = credential.skills.map((skill) => skill.trim()).filter(Boolean);
   const badgeSrc = safeHttpUrl(credential.badge_image_url);
+  const avatarSrc = safeHttpUrl(profile.avatar_url);
   const pdfSrc = safeHttpUrl(credential.pdf_url);
   const shortName = issuerShortName(credential);
   const issuerUrl = safeHttpUrl(credential.issuer_url);
@@ -73,7 +75,7 @@ export function CredentialSheet({
   const typeLabel = credential.credential_type_label?.trim() || "Certificación profesional";
 
   const rows: Array<{ label: string; value: ReactNode } | null> = [
-    { label: "Titular", value: holder },
+    { label: "Titular", value: <Link className="sheet-holder" href={`/${username}`}>{holder}</Link> },
     { label: "Certificación", value: credential.title },
     { label: "Entidad emisora", value: credential.issuer_name },
     issued ? { label: "Fecha de obtención", value: issued } : null,
@@ -123,12 +125,6 @@ export function CredentialSheet({
 
   return (
     <article className="sheet">
-      <nav className="bread" aria-label="Migas de pan">
-        <Link href={`/${username}`}>Credenciales profesionales</Link>
-        <span aria-hidden="true"> / </span>
-        <span>{credential.title}</span>
-      </nav>
-
       <section className={badgeSrc ? "sheet-hero" : "sheet-hero plain"}>
         {badgeSrc ? (
           <div className="sheet-seal">
@@ -138,7 +134,21 @@ export function CredentialSheet({
         <div>
           <p className="eyebrow">{typeLabel}</p>
           <h1>{hero}</h1>
-          <p className="sheet-name">{holder}</p>
+          <div className="sheet-person">
+            {avatarSrc ? (
+              <img className="sheet-avatar" src={avatarSrc} alt="" />
+            ) : (
+              <span className="sheet-avatar sheet-avatar-initials" aria-hidden="true">
+                {nameInitials(holder)}
+              </span>
+            )}
+            <div className="sheet-person-copy">
+              <p className="sheet-name">{holder}</p>
+              <Link className="sheet-profile-link" href={`/${username}`}>
+                Ver perfil completo
+              </Link>
+            </div>
+          </div>
           <span className="sheet-pill">{credential.issuer_name}</span>
         </div>
       </section>
