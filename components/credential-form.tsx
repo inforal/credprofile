@@ -19,7 +19,8 @@ import type { Credential, ExtraField } from "@/lib/types";
 import { RichTextEditor } from "@/components/rich-text-editor";
 import { deleteEmptyCategories, resolveCategoryId } from "@/lib/categories";
 import { IssuerNameField } from "@/components/issuer-name-field";
-import type { IssuerPreset } from "@/lib/issuers";
+import { SuggestionField } from "@/components/suggestion-field";
+import { endSortOrder, type IssuerPreset } from "@/lib/issuers";
 import { normalizeStoredDescription } from "@/lib/rich-text";
 import { blankToNull, parseSkills, safeHttpUrl, slugify, slugProblem } from "@/lib/validation";
 
@@ -45,6 +46,7 @@ export function CredentialForm({
   holderFallback,
   categoryNames = [],
   initialCategory = "",
+  typeLabels = [],
   issuers = [],
 }: {
   credential?: Credential;
@@ -52,6 +54,7 @@ export function CredentialForm({
   holderFallback: string;
   categoryNames?: string[];
   initialCategory?: string;
+  typeLabels?: string[];
   issuers?: IssuerPreset[];
 }) {
   const router = useRouter();
@@ -94,7 +97,6 @@ export function CredentialForm({
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfSubtitleText, setPdfSubtitleText] = useState(credential?.pdf_subtitle ?? "");
   const [published, setPublished] = useState(credential?.is_published ?? true);
-  const [sortOrder, setSortOrder] = useState(String(credential?.sort_order ?? 0));
   const [categoryName, setCategoryName] = useState(initialCategory);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -177,8 +179,6 @@ export function CredentialForm({
       setError("La descripción supera el máximo de 8000 caracteres.");
       return;
     }
-    const sort = Number.parseInt(sortOrder, 10);
-
     setPending(true);
     const uploaded: string[] = [];
     const supabase = createClient();
@@ -267,6 +267,20 @@ export function CredentialForm({
         throw new FormError(error instanceof Error ? error.message : "No se pudo guardar la categoría.");
       }
 
+      const previousCategoryId = credential?.category_id ?? null;
+      const categoryChanged = !credential || previousCategoryId !== categoryId;
+      let sortOrder = credential?.sort_order ?? 0;
+      if (categoryChanged) {
+        let query = supabase.from("credentials").select("id, sort_order").eq("user_id", userId);
+        query = categoryId ? query.eq("category_id", categoryId) : query.is("category_id", null);
+        const { data: siblings, error: sortError } = await query;
+        if (sortError) throw new FormError(dbErrorMessage(sortError));
+        const orders = (siblings ?? [])
+          .filter((row) => row.id !== credential?.id)
+          .map((row) => row.sort_order);
+        sortOrder = endSortOrder(orders);
+      }
+
       const payload = {
         slug: cleanSlug,
         credential_type_label: typeLabel.trim() || "Certificación profesional",
@@ -301,7 +315,7 @@ export function CredentialForm({
         pdf_storage_path: pdf.path,
         pdf_subtitle: blankToNull(pdfSubtitleText),
         is_published: published,
-        sort_order: Number.isFinite(sort) ? sort : 0,
+        sort_order: sortOrder,
         category_id: categoryId,
       };
 
@@ -350,9 +364,15 @@ export function CredentialForm({
       <section className="card pad stack">
         <h2>Ficha</h2>
         <div className="form-grid two">
-          <Field label="Tipo" hint="Aparece encima del título.">
-            <input value={typeLabel} onChange={(event) => setTypeLabel(event.target.value)} maxLength={80} />
-          </Field>
+          <SuggestionField
+            label="Tipo"
+            hint="Aparece encima del título. Puedes elegir uno que ya hayas usado o escribir uno nuevo."
+            value={typeLabel}
+            options={typeLabels}
+            onChange={setTypeLabel}
+            maxLength={80}
+            listLabel="Tipos que ya has usado"
+          />
           <Field label="Enlace" hint={`La ficha se publica en /${username}/${slug || "enlace"}`}>
             <input
               value={slug}
@@ -376,31 +396,20 @@ export function CredentialForm({
             <input value={holderOverride} onChange={(event) => setHolderOverride(event.target.value)} maxLength={160} />
           </Field>
         </div>
-        <div className="control">
-          <span>Categoría</span>
-          <input
-            list="category-suggestions"
-            value={categoryName}
-            onChange={(event) => setCategoryName(event.target.value)}
-            maxLength={80}
-            placeholder="Por ejemplo, Estrategia"
-          />
-          <datalist id="category-suggestions">
-            {categoryNames.map((name) => (
-              <option key={name} value={name} />
-            ))}
-          </datalist>
-          <small>Opcional. Si escribes una nueva, se crea. En blanco, la credencial queda sin categoría.</small>
-        </div>
-        <div className="form-grid two">
-          <label className="check">
-            <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
-            Publicada
-          </label>
-          <Field label="Orden en la categoría" hint="Los números más bajos aparecen primero dentro de la categoría.">
-            <input value={sortOrder} onChange={(event) => setSortOrder(event.target.value)} inputMode="numeric" />
-          </Field>
-        </div>
+        <SuggestionField
+          label="Categoría"
+          hint="Opcional. Puedes elegir una que ya tengas o escribir una nueva. En blanco, la credencial queda sin categoría."
+          value={categoryName}
+          options={categoryNames}
+          onChange={setCategoryName}
+          maxLength={80}
+          placeholder="Por ejemplo, Estrategia"
+          listLabel="Tus categorías"
+        />
+        <label className="check">
+          <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
+          Publicada
+        </label>
       </section>
 
       <section className="card pad stack">

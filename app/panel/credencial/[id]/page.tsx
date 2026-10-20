@@ -4,7 +4,7 @@ import { DeleteCredentialButton } from "@/components/delete-credential-button";
 import { PageFooter } from "@/components/page-footer";
 import { getAuthUserId } from "@/lib/auth";
 import { getOwnCredential, getOwnProfile, listCategories, listOwnCredentials } from "@/lib/data";
-import { issuerPresets } from "@/lib/issuers";
+import { distinctLabels, distinctTypeLabels, issuerPresets } from "@/lib/issuers";
 
 export const metadata = {
   title: "Editar credencial",
@@ -45,8 +45,9 @@ export default async function EditCredentialPage({
         credential={credential}
         username={profile.username}
         holderFallback={profile.full_name}
-        categoryNames={categories.map((category) => category.name)}
+        categoryNames={distinctLabels(categories.map((category) => category.name), false)}
         initialCategory={categoryName}
+        typeLabels={distinctTypeLabels(credentials)}
         issuers={issuerPresets(credentials)}
       />
       <PageFooter />

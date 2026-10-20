@@ -3,7 +3,7 @@ import { CredentialForm } from "@/components/credential-form";
 import { PageFooter } from "@/components/page-footer";
 import { getAuthUserId } from "@/lib/auth";
 import { getOwnProfile, listCategories, listOwnCredentials } from "@/lib/data";
-import { issuerPresets } from "@/lib/issuers";
+import { distinctLabels, distinctTypeLabels, issuerPresets } from "@/lib/issuers";
 
 export const metadata = {
   title: "Nueva credencial",
@@ -25,7 +25,8 @@ export default async function NewCredentialPage() {
       <CredentialForm
         username={profile.username}
         holderFallback={profile.full_name}
-        categoryNames={categories.map((category) => category.name)}
+        categoryNames={distinctLabels(categories.map((category) => category.name), false)}
+        typeLabels={distinctTypeLabels(credentials)}
         issuers={issuerPresets(credentials)}
       />
       <PageFooter />
