@@ -368,9 +368,15 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
 }
 
 .sheet-hero {
-  display: flex;
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  grid-template-areas:
+    "seal copy"
+    "seal person"
+    "seal pill";
+  column-gap: 24px;
+  row-gap: 8px;
   align-items: center;
-  gap: 24px;
   background: white;
   border: 1px solid var(--line);
   border-radius: 20px;
@@ -378,12 +384,19 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
   padding: 28px 32px;
   margin-bottom: 18px;
 }
+.sheet-seal { grid-area: seal; }
+.sheet-hero-copy { grid-area: copy; min-width: 0; }
+.sheet-person { grid-area: person; }
+.sheet-hero .sheet-pill { grid-area: pill; justify-self: start; }
+.sheet-hero.plain {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "copy" "person" "pill";
+}
 .sheet { font-size: 14px; }
 .sheet .eyebrow { font-size: 11px; margin-bottom: 8px; }
-.sheet-hero.plain { display: block; }
-.sheet-hero h1 { margin: 6px 0 8px; font-size: clamp(23px, 2.6vw, 32px); letter-spacing: -0.04em; }
-.sheet-name { margin: 0; font-size: 30px; font-weight: 400; overflow-wrap: anywhere; }
-.sheet-person { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; min-width: 0; }
+.sheet-hero h1 { margin: 6px 0 8px; font-size: clamp(23px, 2.6vw, 32px); letter-spacing: -0.04em; overflow-wrap: break-word; }
+.sheet-name { margin: 0; font-size: 30px; font-weight: 400; line-height: 1.25; overflow-wrap: break-word; }
+.sheet-person { display: flex; align-items: center; gap: 12px; margin: 0; min-width: 0; }
 .sheet-person-copy { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-width: 0; flex: 1 1 auto; }
 .sheet-avatar {
   width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none;
@@ -495,10 +508,25 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
   .sheet .viewer { height: 600px; }
 }
 @media (max-width: 640px) {
-  .sheet-hero { align-items: flex-start; padding: 20px 16px; gap: 12px; }
-  .sheet-hero > div { min-width: 0; }
+  .sheet-hero, .sheet-hero.plain {
+    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-areas:
+      "seal copy"
+      "person person"
+      "pill pill";
+    align-items: start;
+    column-gap: 12px;
+    row-gap: 12px;
+    padding: 20px 16px;
+  }
+  .sheet-hero.plain {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "copy" "person" "pill";
+  }
+  .sheet-hero > div, .sheet-hero-copy { min-width: 0; }
   .sheet-hero h1 { font-size: 23px; }
   .sheet-name { font-size: 21px; }
+  .sheet-person-copy { flex-direction: column; align-items: flex-start; gap: 8px; }
   .sheet-avatar { width: 40px; height: 40px; }
   .sheet-avatar-initials { font-size: 14px; }
   .sheet-pill { font-size: 12px; }

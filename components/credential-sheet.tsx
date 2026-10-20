@@ -131,26 +131,26 @@ export function CredentialSheet({
             <img src={badgeSrc} alt={`Insignia de ${credential.title}`} />
           </div>
         ) : null}
-        <div>
+        <div className="sheet-hero-copy">
           <p className="eyebrow">{typeLabel}</p>
           <h1>{hero}</h1>
-          <div className="sheet-person">
-            {avatarSrc ? (
-              <img className="sheet-avatar" src={avatarSrc} alt="" />
-            ) : (
-              <span className="sheet-avatar sheet-avatar-initials" aria-hidden="true">
-                {nameInitials(holder)}
-              </span>
-            )}
-            <div className="sheet-person-copy">
-              <p className="sheet-name">{holder}</p>
-              <Link className="sheet-profile-link" href={`/${username}`}>
-                Ver perfil completo
-              </Link>
-            </div>
-          </div>
-          <span className="sheet-pill">{credential.issuer_name}</span>
         </div>
+        <div className="sheet-person">
+          {avatarSrc ? (
+            <img className="sheet-avatar" src={avatarSrc} alt="" />
+          ) : (
+            <span className="sheet-avatar sheet-avatar-initials" aria-hidden="true">
+              {nameInitials(holder)}
+            </span>
+          )}
+          <div className="sheet-person-copy">
+            <p className="sheet-name">{holder}</p>
+            <Link className="sheet-profile-link" href={`/${username}`}>
+              Ver perfil completo
+            </Link>
+          </div>
+        </div>
+        <span className="sheet-pill">{credential.issuer_name}</span>
       </section>
 
       <div className={hasRight ? "sheet-layout" : "sheet-layout solo"}>
