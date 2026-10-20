@@ -398,10 +398,15 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
   font-size: 13px; font-weight: 700; text-decoration: none;
 }
 .sheet-profile-link:hover, .sheet-profile-link:focus-visible { background: #eef2ff; border-color: #d5defb; }
-.sheet-holder { color: inherit; font-weight: inherit; text-decoration: none; }
-.sheet-holder:hover, .sheet-holder:focus-visible {
-  color: var(--blue); text-decoration: underline; text-underline-offset: 3px;
+.sheet-holder {
+  color: var(--blue); font-weight: inherit; text-decoration: underline;
+  text-decoration-thickness: 1px; text-underline-offset: 3px; overflow-wrap: anywhere;
+  padding: 4px 0;
 }
+.sheet-holder:hover, .sheet-holder:focus-visible {
+  color: #0e2478; text-decoration-thickness: 2px;
+}
+.sheet-holder:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 2px; }
 .sheet-pill {
   display: inline-block;
   background: #eef2ff;
