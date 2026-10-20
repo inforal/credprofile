@@ -501,9 +501,15 @@ dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
 .profile-action { cursor: pointer; color: var(--blue); background: #eef2ff; border-color: #d5defb; }
 .profile-state { color: #3d4d6b; background: var(--soft); }
 .profile-hero {
-  display: flex; gap: 22px; align-items: center;
+  position: relative; overflow: hidden; display: flex; gap: 22px; align-items: center;
   padding: 28px 32px; margin-bottom: 28px; background: #f3f8fd;
 }
+.profile-hero::after {
+  content: ""; pointer-events: none;
+  background: radial-gradient(circle at 40% 45%, #2454e629, #0000 62%), linear-gradient(135deg, #0000 100%, #e36a521a);
+  width: 460px; height: 320px; position: absolute; top: -90px; right: -80px;
+}
+.profile-hero > * { position: relative; z-index: 1; }
 .profile-avatar {
   width: 112px; height: 112px; border-radius: 50%; object-fit: cover; flex: none;
   box-shadow: 0 8px 24px rgba(18, 32, 71, 0.08);
